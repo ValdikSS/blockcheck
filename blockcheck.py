@@ -11,13 +11,11 @@ except ImportError:
 
 def print(*args, **kwargs):
     if tkusable:
-        #text.insert(tk.END, "%s %s" % (args))
         for arg in args:
             text.insert(tk.END, str(arg) + " ")
         text.insert(tk.END, "\n")
         text.see(tk.END)
         text.update()
-        #__builtins__.print(*args)
     else:
         __builtins__.print(*args, **kwargs)
 
@@ -30,7 +28,7 @@ def _get_a_records(sitelist, dnsserver = None):
     result = []
     for site in sitelist:
         for item in resolver.query(site).rrset.items:
-            result.append(str(item))
+            result.append(item.to_text())
 
     return result
 
