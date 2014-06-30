@@ -9,5 +9,5 @@ setup(name='blockcheck',
       version='0.1',
       description='BlockCheck',
       executables=executables,
-      options = {'build_exe': {'init_script':'Console'}},
+      options = {'build_exe': {'init_script':'Console', 'compressed':'1'}},
       )
