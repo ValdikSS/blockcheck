@@ -2,6 +2,24 @@
 # coding: utf-8
 import urllib.request
 import dns.resolver
+try:
+    import tkinter as tk
+    import threading
+    tkusable = True
+except ImportError:
+    tkusable = False
+
+def print(*args, **kwargs):
+    if tkusable:
+        #text.insert(tk.END, "%s %s" % (args))
+        for arg in args:
+            text.insert(tk.END, str(arg) + " ")
+        text.insert(tk.END, "\n")
+        text.see(tk.END)
+        text.update()
+        #__builtins__.print(*args)
+    else:
+        __builtins__.print(*args, **kwargs)
 
 def _get_a_records(sitelist, dnsserver = None):
     resolver = dns.resolver.Resolver()
@@ -132,4 +150,12 @@ def main():
     print("Тип блокировки определить не удалось.")
 
 if __name__ == "__main__":
-    main()
+    if tkusable:
+        root = tk.Tk()
+        root.title("BlockCheck")
+        text = tk.Text(root)
+        text.pack()
+        threading.Thread(target=main).start()
+        root.mainloop()
+    else:
+        main()
