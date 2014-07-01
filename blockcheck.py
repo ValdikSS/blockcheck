@@ -47,15 +47,16 @@ def _get_url(url, proxy = None):
     return (opened.status, str(opened.readall()))
 
 def test_dns():
-    sites = ["grani.ru"]
+    sites = {"grani.ru": '209.114.51.182'}
+    sites_list = list(sites.keys())
     
     print("[O] Тестируем DNS")
-    resolved_default_dns = _get_a_records(sites)
-    print("\tАдреса через системный DNS:\t", resolved_default_dns)
-    resolved_google_dns = _get_a_records(sites, '8.8.4.4')
-    print("\tАдреса через Google DNS:\t", resolved_google_dns)
-    resolved_az_dns = _get_a_records(sites, '107.150.11.192')
-    print("\tАдреса через DNS AntiZapret:\t", resolved_az_dns)
+    resolved_default_dns = _get_a_records(sites_list)
+    print("\tАдреса через системный DNS:\t", str(resolved_default_dns))
+    resolved_google_dns = _get_a_records(sites_list, '8.8.4.4')
+    print("\tАдреса через Google DNS:\t", str(resolved_google_dns))
+    resolved_az_dns = _get_a_records(sites_list, '107.150.11.192')
+    print("\tАдреса через DNS AntiZapret:\t", str(resolved_az_dns))
 
     if resolved_default_dns == resolved_google_dns:
         if resolved_az_dns != resolved_default_dns:
@@ -63,13 +64,18 @@ def test_dns():
             print("[✓] DNS не перенаправляется")
             return 0
         elif resolved_az_dns == resolved_default_dns:
-            print("[☠] DNS записи подменяются")
-            print("[☠] DNS перенаправляется")
-            return 1
+            if resolved_default_dns == list(sites.values()):
+                print("[✓] DNS записи не подменяются")
+                print("[☠] DNS перенаправляется")
+                return 1
+            else:
+                print("[☠] DNS записи подменяются")
+                print("[☠] DNS перенаправляется")
+                return 2
     else:
         print("[☠] DNS записи подменяются")
         print("[✓] DNS не перенаправляется")
-        return 2
+        return 3
 
 def test_http_access():
     sites = {'http://grani.ru/':
@@ -85,7 +91,7 @@ def test_http_access():
 
     siteresults = []
     for site in sites:
-        print("\tОткрываем", site)
+        print("\tОткрываем ", site)
         result = _get_url(site)
         if result[0] == sites[site]['status'] and result[1].find(sites[site]['lookfor']) != -1:
             print("[✓] Сайт открывается")
@@ -96,7 +102,7 @@ def test_http_access():
 
     siteresults_proxy = []
     for site in sites:
-        print("\tОткрываем через прокси", site)
+        print("\tОткрываем через прокси ", site)
         result_proxy = _get_url(site, proxy)
         if result_proxy[0] == sites[site]['status'] and result_proxy[1].find(sites[site]['lookfor']) != -1:
             print("[✓] Сайт открывается")
@@ -124,15 +130,20 @@ def main():
     http = test_http_access()
     print()
     print("[!] Результат:")
-    if dns == 2:
+    if dns == 3:
         print("Ваш провайдер подменяет DNS-записи, но не перенаправляет чужие DNS-серверы на свой.\n",
               "Вам поможет смена DNS, например, на Яндекс.DNS 77.88.8.8 или Google DNS 8.8.8.8 и 8.8.4.4.")
-    elif dns == 1:
+    elif dns == 2:
         print("Ваш провайдер подменяет DNS-записи и перенаправляет чужие DNS-серверы на свой.\n",
-              "Вам следует использовать непрямой канал до DNS-серверов, например, через VPN, Tor или",
+              "Вам следует использовать непрямой канал до DNS-серверов, например, через VPN, Tor или " + \
+              "HTTPS/Socks прокси.")
+    elif dns == 1:
+        print("Ваш провайдер перенаправляет чужие DNS-серверы на свой, но не подменяет DNS-записи.\n",
+              "Это несколько странно и часто встречается в мобильных сетях.\n",
+              "Вам следует использовать непрямой канал до DNS-серверов, например, через VPN, Tor или " + \
               "HTTPS/Socks прокси.")
     elif http == 2:
-        print("У вашего провайдера \"полный\" DPI. Он отслеживает ссылки даже внутри прокси, поэтому вам следует",
+        print("У вашего провайдера \"полный\" DPI. Он отслеживает ссылки даже внутри прокси, поэтому вам следует" + \
               "использовать любое шифрованное соединение, например, VPN или Tor.")
     elif http == 1:
         print("У вашего провайдер \"обычный\" DPI.\n",
