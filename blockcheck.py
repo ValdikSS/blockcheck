@@ -40,7 +40,10 @@ def _get_url(url, proxy = None):
     
     req.add_header('User-Agent', 'Mozilla/5.0 (X11; Linux x86_64; rv:30.0) Gecko/20100101 Firefox/30.0')
 
-    opened = urllib.request.urlopen(req)
+    try:
+        opened = urllib.request.urlopen(req, timeout=15)
+    except:
+        return (0, '')
     return (opened.status, str(opened.readall()))
 
 def test_dns():
