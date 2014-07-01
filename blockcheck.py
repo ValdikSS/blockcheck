@@ -38,7 +38,7 @@ def _get_url(url, proxy = None):
     if proxy:
         req.set_proxy(proxy, 'http')
     
-    req.add_header('User-Agent', 'Mozilla/5.0 (X11; U; Linux i686) Gecko/20071127 Firefox/2.0.0.11')
+    req.add_header('User-Agent', 'Mozilla/5.0 (X11; Linux x86_64; rv:30.0) Gecko/20100101 Firefox/30.0')
 
     opened = urllib.request.urlopen(req)
     return (opened.status, str(opened.readall()))
