@@ -12,7 +12,7 @@ except ImportError:
 def print(*args, **kwargs):
     if tkusable:
         for arg in args:
-            text.insert(tk.END, str(arg) + " ")
+            text.insert(tk.END, str(arg))
         text.insert(tk.END, "\n")
         text.see(tk.END)
         text.update()
