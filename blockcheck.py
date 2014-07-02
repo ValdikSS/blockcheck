@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # coding: utf-8
+import argparse
 import urllib.request
 import dns.resolver
 try:
@@ -177,6 +178,12 @@ def main():
     _get_url('http://blockcheck.antizapret.prostovpn.org/index.php?dns=' + str(dns) + '&http=' + str(http))
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Определитель типа блокировки сайтов у провайдера.')
+    parser.add_argument('--console', action='store_true', help='Консольный режим. Отключает Tkinter GUI.')
+    args = parser.parse_args()
+    if args.console:
+        tkusable = False
+
     if tkusable:
         root = tk.Tk()
         root.title("BlockCheck")
