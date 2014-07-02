@@ -104,12 +104,10 @@ def test_dns():
         return 3
 
 def test_http_access(by_ip = False):
-    sites = {'http://grani.ru/':
-                 {'status': 200, 'lookfor': 'href="/wiki/Blocked/" class="loud"'},
-             'http://www.lostfilm.tv/details.php?id=4141':
-                 {'status': 200, 'lookfor': 'Achilles Heel'},
-             'http://www.lostfilm.tv/':
-                 {'status': 200, 'lookfor': 'LostFilm.TV.'},
+    sites = {'http://gelbooru.com/':
+                 {'status': 200, 'lookfor': 'Hentai and Anime Imageboard', 'ip': '208.100.25.82'},
+             'http://gelbooru.com/index.php?page=post&s=view&id=1989610':
+                 {'status': 200, 'lookfor': 'Gelbooru- Image View', 'ip': '208.100.25.82'},
             }
     proxy = 'proxy.antizapret.prostovpn.org:3128'
     
