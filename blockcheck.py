@@ -7,19 +7,39 @@ import dns.resolver
 try:
     import tkinter as tk
     import threading
+    import queue
     tkusable = True
 except ImportError:
     tkusable = False
 
+class ThreadSafeConsole(tk.Text):
+    def __init__(self, master, **options):
+        tk.Text.__init__(self, master, **options)
+        self.queue = queue.Queue()
+        self.update_me()
+    def write(self, line):
+        self.queue.put(line)
+    def clear(self):
+        self.queue.put(None)
+    def update_me(self):
+        try:
+            while 1:
+                line = self.queue.get_nowait()
+                if line is None:
+                    self.delete(1.0, tk.END)
+                else:
+                    self.insert(tk.END, str(line))
+                self.see(tk.END)
+                self.update_idletasks()
+        except queue.Empty:
+            pass
+        self.after(100, self.update_me)
+
 def print(*args, **kwargs):
     if tkusable:
-        def print_tk():
-            for arg in args:
-                text.insert(tk.END, str(arg))
-            text.insert(tk.END, "\n")
-            text.see(tk.END)
-            text.update()
-        text.after_idle(print_tk)
+        for arg in args:
+            text.write(str(arg))
+        text.write("\n")
     else:
         __builtins__.print(*args, **kwargs)
 
@@ -199,7 +219,7 @@ if __name__ == "__main__":
     if tkusable:
         root = tk.Tk()
         root.title("BlockCheck")
-        text = tk.Text(root)
+        text = ThreadSafeConsole(root)
         text.pack()
         threading.Thread(target=main).start()
         root.mainloop()
