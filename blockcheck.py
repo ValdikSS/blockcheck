@@ -2,6 +2,7 @@
 # coding: utf-8
 import argparse
 import urllib.request
+import urllib.parse
 import dns.resolver
 try:
     import tkinter as tk
@@ -40,8 +41,16 @@ def _get_a_records(sitelist, dnsserver = None):
 
     return result
 
-def _get_url(url, proxy = None):
-    req = urllib.request.Request(url)
+def _get_url(url, proxy = None, ip = None):
+    if ip:
+        parsed_url = list(urllib.parse.urlsplit(url))
+        host = parsed_url[1]
+        parsed_url[1] = str(ip)
+        newurl = urllib.parse.urlunsplit(parsed_url)
+        req = urllib.request.Request(newurl)
+        req.add_header('Host', host)
+    else:
+        req = urllib.request.Request(url)
 
     if proxy:
         req.set_proxy(proxy, 'http')
@@ -94,7 +103,7 @@ def test_dns():
         print("[✓] DNS не перенаправляется")
         return 3
 
-def test_http_access():
+def test_http_access(by_ip = False):
     sites = {'http://grani.ru/':
                  {'status': 200, 'lookfor': 'href="/wiki/Blocked/" class="loud"'},
              'http://www.lostfilm.tv/details.php?id=4141':
@@ -109,7 +118,7 @@ def test_http_access():
     siteresults = []
     for site in sites:
         print("\tОткрываем ", site)
-        result = _get_url(site)
+        result = _get_url(site, ip=sites[site].get('ip') if by_ip else None)
         if result[0] == sites[site]['status'] and result[1].find(sites[site]['lookfor']) != -1:
             print("[✓] Сайт открывается")
             siteresults.append(True)
@@ -144,7 +153,10 @@ def test_http_access():
 def main():
     dns = test_dns()
     print()
-    http = test_http_access()
+    if dns == 0:
+        http = test_http_access(False)
+    else:
+        http = test_http_access(True)
     print()
     print("[!] Результат:")
     if dns == 4:
