@@ -52,7 +52,7 @@ def _get_url(url, proxy = None):
     return (opened.status, str(opened.readall()))
 
 def test_dns():
-    sites = {"grani.ru": '209.114.51.182'}
+    sites = {"gelbooru.com": '208.100.25.82'}
     sites_list = list(sites.keys())
     
     print("[O] Тестируем DNS")
