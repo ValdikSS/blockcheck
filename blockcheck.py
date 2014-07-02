@@ -21,14 +21,19 @@ def print(*args, **kwargs):
 
 def _get_a_records(sitelist, dnsserver = None):
     resolver = dns.resolver.Resolver()
+    resolver.timeout = 5
+    resolver.lifetime = 5
     
     if dnsserver:
         resolver.nameservers = [dnsserver]
 
     result = []
     for site in sitelist:
-        for item in resolver.query(site).rrset.items:
-            result.append(item.to_text())
+        try:
+            for item in resolver.query(site).rrset.items:
+                result.append(item.to_text())
+        except:
+            return ""
 
     return result
 
@@ -54,9 +59,18 @@ def test_dns():
     resolved_default_dns = _get_a_records(sites_list)
     print("\tАдреса через системный DNS:\t", str(resolved_default_dns))
     resolved_google_dns = _get_a_records(sites_list, '8.8.4.4')
-    print("\tАдреса через Google DNS:\t", str(resolved_google_dns))
+    if resolved_google_dns != "":
+        print("\tАдреса через Google DNS:\t", str(resolved_google_dns))
+    else:
+        print("\tНе удалось подключиться к Google DNS")
     resolved_az_dns = _get_a_records(sites_list, '107.150.11.192')
-    print("\tАдреса через DNS AntiZapret:\t", str(resolved_az_dns))
+    if resolved_az_dns != "":
+        print("\tАдреса через DNS AntiZapret:\t", str(resolved_az_dns))
+    else:
+        print("\tНе удалось подключиться к DNS AntiZapret")
+
+    if (resolved_google_dns == "") & (resolved_google_dns == ""):
+        return 4
 
     if resolved_default_dns == resolved_google_dns:
         if resolved_az_dns != resolved_default_dns:
@@ -130,7 +144,11 @@ def main():
     http = test_http_access()
     print()
     print("[!] Результат:")
-    if dns == 3:
+    if dns == 4:
+        print("Ваш провайдер блокирует чужие DNS-серверы.\n",
+              "Вам следует использовать непрямой канал до DNS-серверов, например, через VPN, Tor или " + \
+              "HTTPS/Socks прокси.")
+    elif dns == 3:
         print("Ваш провайдер подменяет DNS-записи, но не перенаправляет чужие DNS-серверы на свой.\n",
               "Вам поможет смена DNS, например, на Яндекс.DNS 77.88.8.8 или Google DNS 8.8.8.8 и 8.8.4.4.")
     elif dns == 2:
