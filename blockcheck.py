@@ -88,7 +88,8 @@ def _get_url(url, proxy = None, ip = None):
     return (opened.status, str(opened.readall()))
 
 def test_dns():
-    sites = {"gelbooru.com": '208.100.25.82'}
+    sites = {"gelbooru.com": '208.100.25.82',
+             "lostfilm.tv": ['162.159.249.129', '162.159.250.129']}
     sites_list = list(sites.keys())
     
     print("[O] Тестируем DNS")
@@ -132,6 +133,10 @@ def test_http_access(by_ip = False):
                  {'status': 200, 'lookfor': 'Hentai and Anime Imageboard', 'ip': '208.100.25.82'},
              'http://gelbooru.com/index.php?page=post&s=view&id=1989610':
                  {'status': 200, 'lookfor': 'Gelbooru- Image View', 'ip': '208.100.25.82'},
+             'http://www.lostfilm.tv/':
+                 {'status': 200, 'lookfor': 'LostFilm.TV.'},
+             'http://www.lostfilm.tv/details.php?id=4141':
+                 {'status': 200, 'lookfor': 'Achilles Heel'},
             }
     proxy = 'proxy.antizapret.prostovpn.org:3128'
     
