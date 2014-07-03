@@ -9,31 +9,35 @@ try:
     import threading
     import queue
     tkusable = True
+
+    class ThreadSafeConsole(tk.Text):
+        def __init__(self, master, **options):
+            tk.Text.__init__(self, master, **options)
+            self.queue = queue.Queue()
+            self.update_me()
+        def write(self, line):
+            self.queue.put(line)
+        def clear(self):
+            self.queue.put(None)
+        def update_me(self):
+            try:
+                while 1:
+                    line = self.queue.get_nowait()
+                    if line is None:
+                        self.delete(1.0, tk.END)
+                    else:
+                        self.insert(tk.END, str(line))
+                    self.see(tk.END)
+                    self.update_idletasks()
+            except queue.Empty:
+                pass
+            self.after(100, self.update_me)
+
 except ImportError:
     tkusable = False
 
-class ThreadSafeConsole(tk.Text):
-    def __init__(self, master, **options):
-        tk.Text.__init__(self, master, **options)
-        self.queue = queue.Queue()
-        self.update_me()
-    def write(self, line):
-        self.queue.put(line)
-    def clear(self):
-        self.queue.put(None)
-    def update_me(self):
-        try:
-            while 1:
-                line = self.queue.get_nowait()
-                if line is None:
-                    self.delete(1.0, tk.END)
-                else:
-                    self.insert(tk.END, str(line))
-                self.see(tk.END)
-                self.update_idletasks()
-        except queue.Empty:
-            pass
-        self.after(100, self.update_me)
+    class ThreadSafeConsole():
+        pass
 
 def print(*args, **kwargs):
     if tkusable:
