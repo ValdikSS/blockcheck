@@ -63,7 +63,7 @@ def _get_a_records(sitelist, dnsserver = None):
         except:
             return ""
 
-    return result
+    return sorted(result)
 
 def _get_url(url, proxy = None, ip = None):
     if ip:
