@@ -89,7 +89,8 @@ def _get_url(url, proxy = None, ip = None):
 
 def test_dns():
     sites = {"gelbooru.com": '208.100.25.82',
-             "lostfilm.tv": ['162.159.249.129', '162.159.250.129']}
+             "lostfilm.tv": ['162.159.249.129', '162.159.250.129'],
+             "sukebei.nyaa.se": '188.95.48.66'}
     sites_list = list(sites.keys())
     
     print("[O] Тестируем DNS")
@@ -134,9 +135,13 @@ def test_http_access(by_ip = False):
              'http://gelbooru.com/index.php?page=post&s=view&id=1989610':
                  {'status': 200, 'lookfor': 'Gelbooru- Image View', 'ip': '208.100.25.82'},
              'http://www.lostfilm.tv/':
-                 {'status': 200, 'lookfor': 'LostFilm.TV.'},
+                 {'status': 200, 'lookfor': 'LostFilm.TV.', 'ip': '162.159.250.129'},
              'http://www.lostfilm.tv/details.php?id=4141':
-                 {'status': 200, 'lookfor': 'Achilles Heel'},
+                 {'status': 200, 'lookfor': 'Achilles Heel', 'ip': '162.159.250.129'},
+             'http://sukebei.nyaa.se/':
+                 {'status': 200, 'lookfor': 'A BitTorrent community', 'ip': '188.95.48.66'},
+             'http://sukebei.nyaa.se/?page=view&tid=395631':
+                 {'status': 200, 'lookfor': 'A BitTorrent community', 'ip': '188.95.48.66'},
             }
     proxy = 'proxy.antizapret.prostovpn.org:3128'
     
