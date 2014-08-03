@@ -136,7 +136,7 @@ def test_dns():
         return 4
 
     if resolved_default_dns == resolved_google_dns:
-        if resolved_az_dns != resolved_default_dns:
+        if resolved_az_dns != resolved_default_dns and set(resolved_az_dns) == {antizapret_dns}:
             print("[✓] DNS записи не подменяются")
             print("[✓] DNS не перенаправляется")
             return 0
