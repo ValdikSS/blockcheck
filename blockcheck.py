@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 # coding: utf-8
 import argparse
+import itertools
 import urllib.request
 import urllib.parse
 import dns.resolver
 
 # Configuration
-dns_records_list = {"gelbooru.com": '208.100.25.82',
+dns_records_list = {"gelbooru.com": ['208.100.25.82'],
                     "lostfilm.tv": ['162.159.249.129', '162.159.250.129'],
-                    "sukebei.nyaa.se": '188.95.48.66',
+                    "sukebei.nyaa.se": ['188.95.48.66'],
                     "2chru.net": ['162.159.251.219', '198.41.249.219']}
 
 http_list = {'http://gelbooru.com/':
@@ -117,42 +118,68 @@ def _get_url(url, proxy = None, ip = None):
 def test_dns():
     sites = dns_records_list
     sites_list = list(sites.keys())
+    sites_values = list(itertools.chain(*sites.values()))
     
     print("[O] Тестируем DNS")
     resolved_default_dns = _get_a_records(sites_list)
     print("\tАдреса через системный DNS:\t", str(resolved_default_dns))
     resolved_google_dns = _get_a_records(sites_list, google_dns)
-    if resolved_google_dns != "":
+    if resolved_google_dns:
         print("\tАдреса через Google DNS:\t", str(resolved_google_dns))
     else:
         print("\tНе удалось подключиться к Google DNS")
     resolved_az_dns = _get_a_records(sites_list, antizapret_dns)
-    if resolved_az_dns != "":
+    if resolved_az_dns:
         print("\tАдреса через DNS AntiZapret:\t", str(resolved_az_dns))
     else:
         print("\tНе удалось подключиться к DNS AntiZapret")
 
-    if (resolved_google_dns == "") & (resolved_google_dns == ""):
+    # далее рассматриваем каждый возможный случай -- желательно по отдельности
+    
+    if not resolved_google_dns or not resolved_az_dns:
+        # это самый простой случай провайдерской DNS-блокировки
         return 4
-
-    if resolved_default_dns == resolved_google_dns:
-        if resolved_az_dns != resolved_default_dns and set(resolved_az_dns) == {antizapret_dns}:
-            print("[✓] DNS записи не подменяются")
-            print("[✓] DNS не перенаправляется")
-            return 0
-        elif resolved_az_dns == resolved_default_dns:
-            if resolved_default_dns == list(sites.values()):
-                print("[✓] DNS записи не подменяются")
-                print("[☠] DNS перенаправляется")
-                return 1
-            else:
-                print("[☠] DNS записи подменяются")
-                print("[☠] DNS перенаправляется")
-                return 2
-    else:
+    
+    if set(resolved_default_dns) != set(sites_values) \
+            and set(resolved_google_dns) == set(sites_values):
+        # это самый простой случай провайдерской DNS-подмены
         print("[☠] DNS записи подменяются")
         print("[✓] DNS не перенаправляется")
         return 3
+    
+    if set(resolved_google_dns) != set(sites_values):
+        print("[☠] DNS перенаправляется")
+        # XXX
+        #       мы выявили что DNS перенаправляется, но вдруг это не является проблемой?
+        #       смотрим чуть глубже:
+        if set(resolved_default_dns) == set(sites_values):
+            print("[✓] Но системный DNS работает корректно")
+            return 5
+        else:
+            print("[☠] DNS записи подменяются")
+            return 2
+    
+    if set(resolved_az_dns) == set(sites_values) \
+            and set(resolved_google_dns) == set(sites_values):
+        # XXX
+        #       это хитрый случай, так как ``resolved_az_dns`` должен содержать другое
+        print("[✓] DNS записи не подменяются")
+        print("[☠] DNS перенаправляется")
+        return 1
+    
+    # лишь в последнюю очередь -- если ранее косяков не было выявлено --
+    #   то наконец мы можем перейти к проверке самого благосостоятельного варианта
+    
+    if set(resolved_default_dns) == set(sites_values) \
+            and set(resolved_google_dns) == set(sites_values):
+        # самое лучшее что может быть: все равны!
+        print("[✓] DNS записи не подменяются")
+        print("[✓] DNS не перенаправляется")
+        return 0
+    
+    # иначе (если интерпретатор дошёл до этого места в коде) --
+    #   мы не можем сделать какой-бы-то-ни-было вывод.
+    #   в итоге взвратится None и утилита не сделает ни какого вывода (так как 0 != None)
 
 def test_http_access(by_ip = False):
     sites = http_list
