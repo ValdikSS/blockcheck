@@ -4,6 +4,33 @@ import argparse
 import urllib.request
 import urllib.parse
 import dns.resolver
+
+# Configuration
+dns_records_list = {"gelbooru.com": '208.100.25.82',
+                    "lostfilm.tv": ['162.159.249.129', '162.159.250.129'],
+                    "sukebei.nyaa.se": '188.95.48.66',
+                    "2chru.net": ['162.159.251.219', '198.41.249.219']}
+
+http_list = {'http://gelbooru.com/':
+                 {'status': 200, 'lookfor': 'Hentai and Anime Imageboard', 'ip': '208.100.25.82'},
+             'http://gelbooru.com/index.php?page=post&s=view&id=1989610':
+                 {'status': 200, 'lookfor': 'Gelbooru- Image View', 'ip': '208.100.25.82'},
+             'http://www.lostfilm.tv/':
+                 {'status': 200, 'lookfor': 'LostFilm.TV.', 'ip': '162.159.250.129'},
+             'http://www.lostfilm.tv/details.php?id=4141':
+                 {'status': 200, 'lookfor': 'Achilles Heel', 'ip': '162.159.250.129'},
+             'http://sukebei.nyaa.se/':
+                 {'status': 200, 'lookfor': 'A BitTorrent community', 'ip': '188.95.48.66'},
+             'http://sukebei.nyaa.se/?page=view&tid=395631':
+                 {'status': 200, 'lookfor': 'A BitTorrent community', 'ip': '188.95.48.66'},
+            }
+
+proxy_addr = 'proxy.antizapret.prostovpn.org:3128'
+google_dns = '8.8.4.4'
+antizapret_dns = '107.150.11.192'
+
+# End configuration
+
 try:
     import tkinter as tk
     import threading
@@ -88,21 +115,18 @@ def _get_url(url, proxy = None, ip = None):
     return (opened.status, str(opened.readall()))
 
 def test_dns():
-    sites = {"gelbooru.com": '208.100.25.82',
-             "lostfilm.tv": ['162.159.249.129', '162.159.250.129'],
-             "sukebei.nyaa.se": '188.95.48.66',
-             "2chru.net": ['162.159.251.219', '198.41.249.219']}
+    sites = dns_records_list
     sites_list = list(sites.keys())
     
     print("[O] Тестируем DNS")
     resolved_default_dns = _get_a_records(sites_list)
     print("\tАдреса через системный DNS:\t", str(resolved_default_dns))
-    resolved_google_dns = _get_a_records(sites_list, '8.8.4.4')
+    resolved_google_dns = _get_a_records(sites_list, google_dns)
     if resolved_google_dns != "":
         print("\tАдреса через Google DNS:\t", str(resolved_google_dns))
     else:
         print("\tНе удалось подключиться к Google DNS")
-    resolved_az_dns = _get_a_records(sites_list, '107.150.11.192')
+    resolved_az_dns = _get_a_records(sites_list, antizapret_dns)
     if resolved_az_dns != "":
         print("\tАдреса через DNS AntiZapret:\t", str(resolved_az_dns))
     else:
@@ -131,20 +155,8 @@ def test_dns():
         return 3
 
 def test_http_access(by_ip = False):
-    sites = {'http://gelbooru.com/':
-                 {'status': 200, 'lookfor': 'Hentai and Anime Imageboard', 'ip': '208.100.25.82'},
-             'http://gelbooru.com/index.php?page=post&s=view&id=1989610':
-                 {'status': 200, 'lookfor': 'Gelbooru- Image View', 'ip': '208.100.25.82'},
-             'http://www.lostfilm.tv/':
-                 {'status': 200, 'lookfor': 'LostFilm.TV.', 'ip': '162.159.250.129'},
-             'http://www.lostfilm.tv/details.php?id=4141':
-                 {'status': 200, 'lookfor': 'Achilles Heel', 'ip': '162.159.250.129'},
-             'http://sukebei.nyaa.se/':
-                 {'status': 200, 'lookfor': 'A BitTorrent community', 'ip': '188.95.48.66'},
-             'http://sukebei.nyaa.se/?page=view&tid=395631':
-                 {'status': 200, 'lookfor': 'A BitTorrent community', 'ip': '188.95.48.66'},
-            }
-    proxy = 'proxy.antizapret.prostovpn.org:3128'
+    sites = http_list
+    proxy = proxy_addr
     
     print("[O] Тестируем HTTP")
 
