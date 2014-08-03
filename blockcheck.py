@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 # coding: utf-8
 import argparse
+import itertools
 import urllib.request
 import urllib.parse
 import dns.resolver
 
 # Configuration
-dns_records_list = {"gelbooru.com": '208.100.25.82',
+dns_records_list = {"gelbooru.com": ['208.100.25.82'],
                     "lostfilm.tv": ['162.159.249.129', '162.159.250.129'],
-                    "sukebei.nyaa.se": '188.95.48.66',
+                    "sukebei.nyaa.se": ['188.95.48.66'],
                     "2chru.net": ['162.159.251.219', '198.41.249.219']}
 
 http_list = {'http://gelbooru.com/':
@@ -117,6 +118,7 @@ def _get_url(url, proxy = None, ip = None):
 def test_dns():
     sites = dns_records_list
     sites_list = list(sites.keys())
+    sites_values = list(itertools.chain(*sites.values()))
     
     print("[O] Тестируем DNS")
     resolved_default_dns = _get_a_records(sites_list)
@@ -132,27 +134,40 @@ def test_dns():
     else:
         print("\tНе удалось подключиться к DNS AntiZapret")
 
-    if (resolved_google_dns == "") & (resolved_google_dns == ""):
+    if not resolved_google_dns:
         return 4
-
-    if resolved_default_dns == resolved_google_dns:
-        if resolved_az_dns != resolved_default_dns and set(resolved_az_dns) == {antizapret_dns}:
-            print("[✓] DNS записи не подменяются")
-            print("[✓] DNS не перенаправляется")
-            return 0
-        elif resolved_az_dns == resolved_default_dns:
-            if resolved_default_dns == list(sites.values()):
-                print("[✓] DNS записи не подменяются")
-                print("[☠] DNS перенаправляется")
-                return 1
-            else:
-                print("[☠] DNS записи подменяются")
-                print("[☠] DNS перенаправляется")
-                return 2
-    else:
+    
+    # далее рассматриваем каждый возможный случай -- желательно по отдельности
+    
+    if set(resolved_default_dns) != set(sites_values) \
+            and set(resolved_google_dns) == set(sites_values) \
+            and set(resolved_az_dns) == set(sites_values):
         print("[☠] DNS записи подменяются")
         print("[✓] DNS не перенаправляется")
         return 3
+    
+    if set(resolved_google_dns) != set(sites_values) or set(resolved_az_dns) != set(sites_values):
+        print("[☠] DNS перенаправляется")
+        if set(resolved_default_dns) == set(sites_values):
+            print("[✓] Но системный DNS работает корректно")
+            return 5
+        else:
+            print("[☠] DNS записи подменяются")
+            return 2
+    
+    # TODO: в каком случае проявляется вариант с ``return 1`` ? как его выявить?
+    #       думаю в этом месте кода -- для него нужно написать свой блок ``if ...``
+    
+    if set(resolved_default_dns) == set(sites_values) \
+            and set(resolved_google_dns) == set(sites_values)\
+            and set(resolved_az_dns) == set(sites_values):
+        # самое лучшее что может быть: все равны!
+        print("[✓] DNS записи не подменяются")
+        print("[✓] DNS не перенаправляется")
+        return 0
+    
+    # иначе (если код дощёл до этого места) --
+    #       мы не можем сделать какой-бы-то-ни-было вывод
 
 def test_http_access(by_ip = False):
     sites = http_list
