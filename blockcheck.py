@@ -140,13 +140,12 @@ def test_dns():
     # далее рассматриваем каждый возможный случай -- желательно по отдельности
     
     if set(resolved_default_dns) != set(sites_values) \
-            and set(resolved_google_dns) == set(sites_values) \
-            and set(resolved_az_dns) == set(sites_values):
+            and set(resolved_google_dns) == set(sites_values):
         print("[☠] DNS записи подменяются")
         print("[✓] DNS не перенаправляется")
         return 3
     
-    if set(resolved_google_dns) != set(sites_values) or set(resolved_az_dns) != set(sites_values):
+    if set(resolved_google_dns) != set(sites_values):
         print("[☠] DNS перенаправляется")
         if set(resolved_default_dns) == set(sites_values):
             print("[✓] Но системный DNS работает корректно")
@@ -158,13 +157,14 @@ def test_dns():
     # TODO: в каком случае проявляется вариант с ``return 1`` ? как его выявить?
     #       думаю в этом месте кода -- для него нужно написать свой блок ``if ...``
     # ... ... ...
+    # TODO: быть может -- нужно как-то заиспользовать переменную ``set(resolved_az_dns)```
+    #
     
     # лишь в последнюю очередь -- если ранее косяков не было выявлено --
     #   то наконец мы можем перейти к проверке самого благосостоятельного варианта
     
     if set(resolved_default_dns) == set(sites_values) \
-            and set(resolved_google_dns) == set(sites_values)\
-            and set(resolved_az_dns) == set(sites_values):
+            and set(resolved_google_dns) == set(sites_values):
         # самое лучшее что может быть: все равны!
         print("[✓] DNS записи не подменяются")
         print("[✓] DNS не перенаправляется")
