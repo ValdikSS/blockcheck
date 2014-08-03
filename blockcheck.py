@@ -134,19 +134,24 @@ def test_dns():
     else:
         print("\tНе удалось подключиться к DNS AntiZapret")
 
-    if not resolved_google_dns or not resolved_az_dns:
-        return 4
-    
     # далее рассматриваем каждый возможный случай -- желательно по отдельности
+    
+    if not resolved_google_dns or not resolved_az_dns:
+        # это самый простой случай провайдерской DNS-блокировки
+        return 4
     
     if set(resolved_default_dns) != set(sites_values) \
             and set(resolved_google_dns) == set(sites_values):
+        # это самый простой случай провайдерской DNS-подмены
         print("[☠] DNS записи подменяются")
         print("[✓] DNS не перенаправляется")
         return 3
     
     if set(resolved_google_dns) != set(sites_values):
         print("[☠] DNS перенаправляется")
+        # XXX
+        #       мы выявили что DNS перенаправляется, но вдруг это не является проблемой?
+        #       смотрим чуть глубже:
         if set(resolved_default_dns) == set(sites_values):
             print("[✓] Но системный DNS работает корректно")
             return 5
@@ -156,6 +161,8 @@ def test_dns():
     
     if set(resolved_az_dns) == set(sites_values) \
             and set(resolved_google_dns) == set(sites_values):
+        # XXX
+        #       это хитрый случай, так как ``resolved_az_dns`` должен содержать другое
         print("[✓] DNS записи не подменяются")
         print("[☠] DNS перенаправляется")
         return 1
