@@ -90,7 +90,8 @@ def _get_url(url, proxy = None, ip = None):
 def test_dns():
     sites = {"gelbooru.com": '208.100.25.82',
              "lostfilm.tv": ['162.159.249.129', '162.159.250.129'],
-             "sukebei.nyaa.se": '188.95.48.66'}
+             "sukebei.nyaa.se": '188.95.48.66',
+             "2chru.net": ['162.159.251.219', '198.41.249.219']}
     sites_list = list(sites.keys())
     
     print("[O] Тестируем DNS")
