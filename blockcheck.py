@@ -8,9 +8,9 @@ import dns.resolver
 import dns.exception
 
 # Configuration
-dns_records_list = {"gelbooru.com": '208.100.25.82',
+dns_records_list = {"gelbooru.com": ['208.100.25.82'],
                     "lostfilm.tv": ['162.159.249.129', '162.159.250.129'],
-                    "sukebei.nyaa.se": '188.95.48.66',
+                    "sukebei.nyaa.se": ['188.95.48.66'],
                     "2chru.net": ['162.159.251.219', '198.41.249.219']}
 
 http_list = {'http://gelbooru.com/':
@@ -137,24 +137,26 @@ def test_dns():
     if not resolved_google_dns or not resolved_default_dns:
         return 4
 
+    dns_records = sorted([item for sublist in sites.values() for item in sublist])
+
     if resolved_default_dns == resolved_google_dns:
-        if resolved_az_dns != resolved_default_dns and set(resolved_az_dns) == {antizapret_dns}:
-            print("[✓] DNS записи не подменяются")
-            print("[✓] DNS не перенаправляется")
-            return 0
-        elif resolved_az_dns == resolved_default_dns or set(resolved_az_dns) != {antizapret_dns}:
-            if resolved_default_dns == list(sites.values()):
+        if resolved_default_dns == dns_records:
+            if resolved_az_dns == resolved_google_dns:
                 print("[✓] DNS записи не подменяются")
                 print("[☠] DNS перенаправляется")
                 return 1
             else:
-                print("[☠] DNS записи подменяются")
-                print("[☠] DNS перенаправляется")
-                return 2
+                print("[✓] DNS записи не подменяются")
+                print("[✓] DNS не перенаправляется")
+                return 0
+        else:
+            print("[☠] DNS записи подменяются")
+            print("[☠] DNS перенаправляется")
+            return 2
     else:
-        print("[☠] DNS записи подменяются")
-        print("[✓] DNS не перенаправляется")
-        return 3
+        if resolved_google_dns == dns_records:
+            print("[☠] DNS записи подменяются")
+            print("[✓] DNS не перенаправляется")
 
 def test_http_access(by_ip = False):
     sites = http_list
