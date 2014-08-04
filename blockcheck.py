@@ -132,7 +132,7 @@ def test_dns():
     else:
         print("\tНе удалось подключиться к DNS AntiZapret")
 
-    if (resolved_google_dns == "") & (resolved_google_dns == ""):
+    if not resolved_google_dns or not resolved_default_dns:
         return 4
 
     if resolved_default_dns == resolved_google_dns:
