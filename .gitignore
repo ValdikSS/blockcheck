@@ -1,0 +1,6 @@
+# default python files:
+*.pyc
+*.pyo
+
+# cx_Freeze files:
+/dist
