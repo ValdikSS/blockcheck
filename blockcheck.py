@@ -158,7 +158,7 @@ def test_dns():
             print("[☠] DNS записи подменяются")
             print("[✓] DNS не перенаправляется")
             return 3
-        elif set(resolved_az_dns) == {antizapret_dns}:
+        elif set(resolved_az_dns) != {antizapret_dns}:
             print("[☠] DNS записи подменяются")
             print("[☠] DNS перенаправляется")
             return 2
