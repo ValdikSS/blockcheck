@@ -3,7 +3,9 @@
 import argparse
 import urllib.request
 import urllib.parse
+import urllib.error
 import dns.resolver
+import dns.exception
 
 # Configuration
 dns_records_list = {"gelbooru.com": '208.100.25.82',
@@ -87,7 +89,7 @@ def _get_a_records(sitelist, dnsserver = None):
         try:
             for item in resolver.query(site).rrset.items:
                 result.append(item.to_text())
-        except:
+        except dns.exception.DNSException:
             return ""
 
     return sorted(result)
@@ -110,7 +112,7 @@ def _get_url(url, proxy = None, ip = None):
 
     try:
         opened = urllib.request.urlopen(req, timeout=15)
-    except:
+    except urllib.error.URLError:
         return (0, '')
     return (opened.status, str(opened.readall()))
 
