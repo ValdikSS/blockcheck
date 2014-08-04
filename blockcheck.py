@@ -140,7 +140,7 @@ def test_dns():
             print("[✓] DNS записи не подменяются")
             print("[✓] DNS не перенаправляется")
             return 0
-        elif resolved_az_dns == resolved_default_dns:
+        elif resolved_az_dns == resolved_default_dns or set(resolved_az_dns) != {antizapret_dns}:
             if resolved_default_dns == list(sites.values()):
                 print("[✓] DNS записи не подменяются")
                 print("[☠] DNS перенаправляется")
