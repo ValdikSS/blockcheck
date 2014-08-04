@@ -157,6 +157,14 @@ def test_dns():
         if resolved_google_dns == dns_records:
             print("[☠] DNS записи подменяются")
             print("[✓] DNS не перенаправляется")
+            return 3
+        elif set(resolved_az_dns) == {antizapret_dns}:
+            print("[☠] DNS записи подменяются")
+            print("[☠] DNS перенаправляется")
+            return 2
+        else:
+            print("[?] Способ блокировки DNS определить не удалось")
+            return 4
 
 def test_http_access(by_ip = False):
     sites = http_list
