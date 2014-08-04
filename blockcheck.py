@@ -122,12 +122,12 @@ def test_dns():
     resolved_default_dns = _get_a_records(sites_list)
     print("\tАдреса через системный DNS:\t", str(resolved_default_dns))
     resolved_google_dns = _get_a_records(sites_list, google_dns)
-    if resolved_google_dns != "":
+    if resolved_google_dns:
         print("\tАдреса через Google DNS:\t", str(resolved_google_dns))
     else:
         print("\tНе удалось подключиться к Google DNS")
     resolved_az_dns = _get_a_records(sites_list, antizapret_dns)
-    if resolved_az_dns != "":
+    if resolved_az_dns:
         print("\tАдреса через DNS AntiZapret:\t", str(resolved_az_dns))
     else:
         print("\tНе удалось подключиться к DNS AntiZapret")
