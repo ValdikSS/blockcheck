@@ -252,4 +252,7 @@ if __name__ == "__main__":
         threading.Thread(target=main).start()
         root.mainloop()
     else:
-        main()
+        try:
+            main()
+        except (KeyboardInterrupt, SystemExit):
+            quit(1)
