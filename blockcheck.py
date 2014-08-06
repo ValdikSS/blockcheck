@@ -4,6 +4,7 @@ import argparse
 import urllib.request
 import urllib.parse
 import urllib.error
+import socket
 import dns.resolver
 import dns.exception
 
@@ -112,7 +113,7 @@ def _get_url(url, proxy = None, ip = None):
 
     try:
         opened = urllib.request.urlopen(req, timeout=15)
-    except urllib.error.URLError:
+    except (urllib.error.URLError, socket.error):
         return (0, '')
     return (opened.status, str(opened.readall()))
 
