@@ -5,6 +5,7 @@ import urllib.request
 import urllib.parse
 import urllib.error
 import socket
+import ssl
 import dns.resolver
 import dns.exception
 
@@ -27,6 +28,8 @@ http_list = {'http://gelbooru.com/':
              'http://sukebei.nyaa.se/?page=view&tid=395631':
                  {'status': 200, 'lookfor': 'A BitTorrent community', 'ip': '188.95.48.66'},
             }
+
+https_list = {'https://2chru.net/': {'ip': '198.41.249.219'}}
 
 proxy_addr = 'proxy.antizapret.prostovpn.org:3128'
 google_dns = '8.8.4.4'
@@ -112,8 +115,8 @@ def _get_url(url, proxy=None, ip=None):
     req.add_header('User-Agent', 'Mozilla/5.0 (X11; Linux x86_64; rv:30.0) Gecko/20100101 Firefox/30.0')
 
     try:
-        opened = urllib.request.urlopen(req, timeout=15)
-    except (urllib.error.URLError, socket.error):
+        opened = urllib.request.urlopen(req, timeout=15, cadefault=True)
+    except (urllib.error.URLError, socket.error): # we do not expect ssl.CertificateError here
         return (0, '')
     return (opened.status, str(opened.readall()))
 
@@ -208,13 +211,41 @@ def test_http_access(by_ip=False):
         # IP
         return 3
 
+def test_https_cert(by_ip=False):
+    sites = https_list
+
+    print("[O] Тестируем HTTPS")
+
+    siteresults = []
+    for site in sites:
+        print("\tОткрываем ", site)
+        try:
+            result = _get_url(site, ip=sites[site].get('ip') if by_ip else None)
+        except ssl.CertificateError:
+            print("[☠] Сайт не открывается")
+            siteresults.append(False)
+        else:
+            print("[✓] Сайт открывается")
+            siteresults.append(True)
+
+    if all(siteresults):
+        # No blocks
+        return 0
+    else:
+        # Blocked
+        return 1
+
 def main():
     dns = test_dns()
     print()
     if dns == 0:
         http = test_http_access(False)
+        print()
+        https = test_https_cert(False)
     else:
         http = test_http_access(True)
+        print()
+        https = test_https_cert(True)
     print()
     print("[!] Результат:")
     if dns == 4:
@@ -233,6 +264,9 @@ def main():
               "Это несколько странно и часто встречается в мобильных сетях.\n",
               "Вам следует использовать шифрованный канал до DNS-серверов, например, через VPN, Tor или " + \
               "HTTPS/Socks прокси.")
+
+    if https:
+        print("[⚠] Ваш провайдер лезет в HTTPS.")
 
     if http == 3:
         print("[⚠] Ваш провайдер блокирует по IP-адресу.\n",
