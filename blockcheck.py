@@ -280,7 +280,7 @@ def main():
     elif http == 0:
         print("[☺] Ваш провайдер не блокирует сайты.")
 
-    _get_url('http://blockcheck.antizapret.prostovpn.org/index.php?dns=' + str(dns) + '&http=' + str(http) + '&https' + str(https))
+    _get_url('http://blockcheck.antizapret.prostovpn.org/index.php?dns=' + str(dns) + '&http=' + str(http) + '&https=' + str(https))
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Определитель типа блокировки сайтов у провайдера.')
