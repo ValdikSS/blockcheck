@@ -11,8 +11,8 @@ executables = [
 ]
 
 setup(name='blockcheck',
-      version='0.1',
+      version='0.0.5',
       description='BlockCheck',
       executables=executables,
-      options = {'build_exe': {'init_script':'Console', 'compressed':'1'}},
+      options = {'build_exe': {'init_script':'Console', 'compressed':'1', 'packages':'dns'}},
       )
