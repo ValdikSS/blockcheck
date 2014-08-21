@@ -77,7 +77,7 @@ def print(*args, **kwargs):
     else:
         __builtins__.print(*args, **kwargs)
 
-def _get_a_records(sitelist, dnsserver = None):
+def _get_a_records(sitelist, dnsserver=None):
     resolver = dns.resolver.Resolver()
     resolver.timeout = 5
     resolver.lifetime = 5
@@ -95,7 +95,7 @@ def _get_a_records(sitelist, dnsserver = None):
 
     return sorted(result)
 
-def _get_url(url, proxy = None, ip = None):
+def _get_url(url, proxy=None, ip=None):
     if ip:
         parsed_url = list(urllib.parse.urlsplit(url))
         host = parsed_url[1]
@@ -167,7 +167,7 @@ def test_dns():
             print("[?] Способ блокировки DNS определить не удалось")
             return 4
 
-def test_http_access(by_ip = False):
+def test_http_access(by_ip=False):
     sites = http_list
     proxy = proxy_addr
     
