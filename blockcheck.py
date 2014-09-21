@@ -12,7 +12,7 @@ import dns.exception
 # Configuration
 dns_records_list = {"gelbooru.com": ['208.100.25.82'],
                     "lostfilm.tv": ['5.199.162.25'],
-                    "sukebei.nyaa.se": ['188.95.48.66'],
+                    "sukebei.nyaa.se": ['69.165.95.242'],
                     "2chru.net": ['162.159.251.219', '198.41.249.219']}
 
 http_list = {'http://gelbooru.com/':
@@ -24,9 +24,9 @@ http_list = {'http://gelbooru.com/':
              'http://www.lostfilm.tv/details.php?id=4141':
                  {'status': 200, 'lookfor': 'Achilles Heel', 'ip': '5.199.162.25'},
              'http://sukebei.nyaa.se/':
-                 {'status': 200, 'lookfor': 'A BitTorrent community', 'ip': '188.95.48.66'},
+                 {'status': 200, 'lookfor': 'A BitTorrent community', 'ip': '69.165.95.242'},
              'http://sukebei.nyaa.se/?page=view&tid=395631':
-                 {'status': 200, 'lookfor': 'A BitTorrent community', 'ip': '188.95.48.66'},
+                 {'status': 200, 'lookfor': 'A BitTorrent community', 'ip': '69.165.95.242'},
             }
 
 https_list = {'https://2chru.net/': {'ip': '198.41.249.219'}}
