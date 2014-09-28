@@ -10,13 +10,13 @@ import dns.resolver
 import dns.exception
 
 # Configuration
-dns_records_list = {"gelbooru.com": ['208.100.25.82'],
+dns_records_list = {"gelbooru.com": ['5.178.68.100'],
                     "lostfilm.tv": ['5.199.162.25'],
                     "sukebei.nyaa.se": ['69.165.95.242'],
                     "2chru.net": ['162.159.251.219', '198.41.249.219']}
 
 http_list = {'http://gelbooru.com/':
-                 {'status': 200, 'lookfor': 'Hentai and Anime Imageboard', 'ip': '208.100.25.82'},
+                 {'status': 200, 'lookfor': 'Hentai and Anime Imageboard', 'ip': '5.178.68.100'},
              'http://gelbooru.com/index.php?page=post&s=view&id=1989610':
                  {'status': 200, 'lookfor': 'Gelbooru- Image View', 'ip': '208.100.25.82'},
              'http://www.lostfilm.tv/':
