@@ -29,7 +29,7 @@ http_list = {'http://gelbooru.com/':
                  {'status': 200, 'lookfor': 'A BitTorrent community', 'ip': '69.165.95.242'},
             }
 
-https_list = {'https://2chru.net/': {'ip': '198.41.249.219'}}
+https_list = {'https://2chru.net/'}
 
 proxy_addr = 'proxy.antizapret.prostovpn.org:3128'
 google_dns = '8.8.4.4'
@@ -211,7 +211,7 @@ def test_http_access(by_ip=False):
         # IP
         return 3
 
-def test_https_cert(by_ip=False):
+def test_https_cert():
     sites = https_list
 
     print("[O] Тестируем HTTPS")
@@ -220,20 +220,25 @@ def test_https_cert(by_ip=False):
     for site in sites:
         print("\tОткрываем ", site)
         try:
-            result = _get_url(site, ip=sites[site].get('ip') if by_ip else None)
+            result = _get_url(site, None)
+            if result[0] < 200:
+                print("[☠] Сайт не открывается")
+            else:
+                print("[✓] Сайт открывается")
+                siteresults.append(True)
         except ssl.CertificateError:
-            print("[☠] Сайт не открывается")
+            print("[☠] Сертификат подменяется")
             siteresults.append(False)
-        else:
-            print("[✓] Сайт открывается")
-            siteresults.append(True)
 
     if all(siteresults):
         # No blocks
         return 0
-    else:
+    elif any(siteresults):
         # Blocked
         return 1
+    else:
+        # Unknown result
+        return 2
 
 def main():
     dns = test_dns()
@@ -265,7 +270,7 @@ def main():
               "Вам следует использовать шифрованный канал до DNS-серверов, например, через VPN, Tor или " + \
               "HTTPS/Socks прокси.")
 
-    if https:
+    if https == 1:
         print("[⚠] Ваш провайдер лезет в HTTPS.")
 
     if http == 3:
