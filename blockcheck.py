@@ -84,7 +84,7 @@ def _get_a_records(sitelist, dnsserver=None):
     resolver = dns.resolver.Resolver()
     resolver.timeout = 5
     resolver.lifetime = 5
-    
+
     if dnsserver:
         resolver.nameservers = [dnsserver]
 
