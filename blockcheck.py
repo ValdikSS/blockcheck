@@ -245,12 +245,10 @@ def main():
     print()
     if dns == 0:
         http = test_http_access(False)
-        print()
-        https = test_https_cert(False)
     else:
         http = test_http_access(True)
-        print()
-        https = test_https_cert(True)
+    print()
+    https = test_https_cert()
     print()
     print("[!] Результат:")
     if dns == 4:
