@@ -80,7 +80,7 @@ def print(*args, **kwargs):
     else:
         __builtins__.print(*args, **kwargs)
 
-def _get_a_records(sitelist, dnsserver=None):
+def _get_a_record(site, dnsserver=None):
     resolver = dns.resolver.Resolver()
     resolver.timeout = 5
     resolver.lifetime = 5
@@ -89,10 +89,24 @@ def _get_a_records(sitelist, dnsserver=None):
         resolver.nameservers = [dnsserver]
 
     result = []
-    for site in sitelist:
+    while len(resolver.nameservers):
         try:
             for item in resolver.query(site).rrset.items:
                 result.append(item.to_text())
+            return result
+
+        except dns.exception.Timeout:
+            resolver.nameservers.remove(resolver.nameservers[0])
+
+    # If all the requests failed
+    return ""
+
+def _get_a_records(sitelist, dnsserver=None):
+    result = []
+    for site in sitelist:
+        try:
+            for item in _get_a_record(site, dnsserver):
+                result.append(item)
         except dns.exception.DNSException:
             return ""
 
