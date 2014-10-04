@@ -139,6 +139,16 @@ def test_dns():
     sites_list = list(sites.keys())
     
     print("[O] Тестируем DNS")
+    print("[O] Получаем эталонные DNS с сервера")
+    try:
+        remote_dns = urllib.request.urlopen("http://blockcheck.antizapret.prostovpn.org/getdns.php",
+            timeout=10).read()
+        remote_dns = remote_dns.decode('utf-8').split()
+        print("\tЭталонные адреса:\t\t", str(remote_dns))
+    except:
+        remote_dns = None
+        print("[☠] Не удалось получить DNS с сервера, результаты могут быть неточными")
+
     resolved_default_dns = _get_a_records(sites_list)
     print("\tАдреса через системный DNS:\t", str(resolved_default_dns))
     resolved_google_dns = _get_a_records(sites_list, google_dns)
@@ -155,7 +165,11 @@ def test_dns():
     if not resolved_google_dns or not resolved_default_dns:
         return 4
 
-    dns_records = sorted([item for sublist in sites.values() for item in sublist])
+    if (remote_dns):
+        # Если получили IP с сервера, используем их
+        dns_records = remote_dns
+    else:
+        dns_records = sorted([item for sublist in sites.values() for item in sublist])
 
     if resolved_default_dns == resolved_google_dns:
         if resolved_default_dns == dns_records:
