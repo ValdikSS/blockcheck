@@ -125,11 +125,11 @@ def _get_url(url, proxy=None, ip=None):
 
     if proxy:
         req.set_proxy(proxy, 'http')
-    
+
     req.add_header('User-Agent', 'Mozilla/5.0 (X11; Linux x86_64; rv:30.0) Gecko/20100101 Firefox/30.0')
 
     try:
-        opened = urllib.request.urlopen(req, timeout=15, cadefault=True)
+        opened = urllib.request.urlopen(req, timeout=15)
     except (urllib.error.URLError, socket.error): # we do not expect ssl.CertificateError here
         return (0, '')
     return (opened.status, str(opened.readall()))
@@ -137,7 +137,7 @@ def _get_url(url, proxy=None, ip=None):
 def test_dns():
     sites = dns_records_list
     sites_list = list(sites.keys())
-    
+
     print("[O] Тестируем DNS")
     print("[O] Получаем эталонные DNS с сервера")
     try:
@@ -201,7 +201,7 @@ def test_dns():
 def test_http_access(by_ip=False):
     sites = http_list
     proxy = proxy_addr
-    
+
     print("[O] Тестируем HTTP")
 
     siteresults = []
