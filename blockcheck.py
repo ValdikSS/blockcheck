@@ -130,9 +130,10 @@ def _get_url(url, proxy=None, ip=None):
 
     try:
         opened = urllib.request.urlopen(req, timeout=15, cadefault=True)
-    except (urllib.error.URLError, socket.error): # we do not expect ssl.CertificateError here
+        output = opened.readall()
+    except (urllib.error.URLError, socket.error, socket.timeout): # we do not expect ssl.CertificateError here
         return (0, '')
-    return (opened.status, str(opened.readall()))
+    return (opened.status, str(output))
 
 def test_dns():
     sites = dns_records_list
