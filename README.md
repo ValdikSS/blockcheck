@@ -19,6 +19,6 @@ http://habrahabr.ru/post/229377/ — статистика по провайде�
 
 Установка и запуск:
 
-sudo apt-get install python3-pip 
-sudo pip3 install dnspython3 
-sudo python3.4 blockcheck.py 
+sudo apt-get install python3-pip  
+sudo pip3 install dnspython3  
+sudo python3.4 blockcheck.py  
