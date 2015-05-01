@@ -19,10 +19,10 @@ http_list = {'http://gelbooru.com/':
                  {'status': 200, 'lookfor': 'Hentai and Anime Imageboard', 'ip': '5.178.68.100'},
              'http://gelbooru.com/index.php?page=post&s=view&id=1989610':
                  {'status': 200, 'lookfor': 'Gelbooru- Image View', 'ip': '208.100.25.82'},
-             'http://www.lostfilm.tv/':
-                 {'status': 200, 'lookfor': 'LostFilm.TV.', 'ip': '5.199.162.26'},
-             'http://www.lostfilm.tv/details.php?id=4141':
-                 {'status': 200, 'lookfor': 'Achilles Heel', 'ip': '5.199.162.26'},
+             'http://www.skidows.net/':
+                 {'status': 200, 'lookfor': 'dle_root', 'ip': '188.190.119.202'},
+             'http://www.skidows.net/video/nashe-filmy/19440-batalon-2015.html':
+                 {'status': 200, 'lookfor': 'dle_root', 'ip': '188.190.119.202'},
              'http://sukebei.nyaa.se/':
                  {'status': 200, 'lookfor': 'A BitTorrent community', 'ip': '69.165.95.242'},
              'http://sukebei.nyaa.se/?page=view&tid=395631':
