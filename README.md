@@ -16,3 +16,9 @@ blockcheck
 Приложение автоматически отправляет статистику об используемом типе блокировки на сервер.
 
 http://habrahabr.ru/post/229377/ — статистика по провайдерам
+
+Установка и запуск:
+
+sudo apt-get install python3-pip  
+sudo pip3 install dnspython3  
+sudo python3.4 blockcheck.py  
