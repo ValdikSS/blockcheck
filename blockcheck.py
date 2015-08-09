@@ -11,7 +11,7 @@ import dns.exception
 
 # Configuration
 dns_records_list = {"gelbooru.com": ['5.178.68.100'],
-                    "lostfilm.tv": ['5.199.162.26'],
+                    "skidows.ru": ['46.148.17.146'],
                     "sukebei.nyaa.se": ['69.165.95.242'],
                     "2chru.net": ['162.159.251.219', '198.41.249.219']}
 
@@ -19,9 +19,9 @@ http_list = {'http://gelbooru.com/':
                  {'status': 200, 'lookfor': 'Hentai and Anime Imageboard', 'ip': '5.178.68.100'},
              'http://gelbooru.com/index.php?page=post&s=view&id=1989610':
                  {'status': 200, 'lookfor': 'Gelbooru- Image View', 'ip': '208.100.25.82'},
-             'http://www.skidows.net/':
+             'http://skidows.ru/':
                  {'status': 200, 'lookfor': 'dle_root', 'ip': '188.190.119.202'},
-             'http://www.skidows.net/video/nashe-filmy/19440-batalon-2015.html':
+             'http://skidows.ru/20648-nastoyaschiy-detektiv-true-detective-2-sezon-1-2-serii-iz-8-2015-hdtvrip-amedia.html':
                  {'status': 200, 'lookfor': 'dle_root', 'ip': '188.190.119.202'},
              'http://sukebei.nyaa.se/':
                  {'status': 200, 'lookfor': 'A BitTorrent community', 'ip': '69.165.95.242'},
