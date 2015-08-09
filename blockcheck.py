@@ -173,31 +173,28 @@ def test_dns():
         dns_records = sorted([item for sublist in sites.values() for item in sublist])
 
     if resolved_default_dns == resolved_google_dns:
+        if set(resolved_az_dns) == {antizapret_dns}:
+            print("[✓] DNS записи не подменяются")
+            print("[✓] DNS не перенаправляется")
+            return 0
+
         if resolved_default_dns == dns_records:
-            if resolved_az_dns == resolved_google_dns:
-                print("[✓] DNS записи не подменяются")
-                print("[☠] DNS перенаправляется")
-                return 1
-            else:
-                print("[✓] DNS записи не подменяются")
-                print("[✓] DNS не перенаправляется")
-                return 0
+            print("[✓] DNS записи не подменяются")
+            print("[☠] DNS перенаправляется")
+            return 1
         else:
             print("[☠] DNS записи подменяются")
             print("[☠] DNS перенаправляется")
             return 2
+
     else:
         if resolved_google_dns == dns_records:
             print("[☠] DNS записи подменяются")
             print("[✓] DNS не перенаправляется")
             return 3
-        elif set(resolved_az_dns) != {antizapret_dns}:
-            print("[☠] DNS записи подменяются")
-            print("[☠] DNS перенаправляется")
-            return 2
-        else:
-            print("[?] Способ блокировки DNS определить не удалось")
-            return 4
+
+    print("[?] Способ блокировки DNS определить не удалось")
+    return 4
 
 def test_http_access(by_ip=False):
     sites = http_list
