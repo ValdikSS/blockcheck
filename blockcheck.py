@@ -107,6 +107,8 @@ def _get_a_records(sitelist, dnsserver=None):
         try:
             for item in _get_a_record(site, dnsserver):
                 result.append(item)
+        except dns.resolver.NXDOMAIN:
+            print("[!] Невозможно получить DNS-запись (NXDOMAIN). Результаты могут быть неточными.")
         except dns.exception.DNSException:
             return ""
 
