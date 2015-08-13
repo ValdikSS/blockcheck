@@ -108,7 +108,7 @@ def _get_a_records(sitelist, dnsserver=None):
             for item in _get_a_record(site, dnsserver):
                 result.append(item)
         except dns.exception.DNSException:
-            return ""
+            continue
 
     return sorted(result)
 
