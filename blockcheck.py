@@ -192,7 +192,7 @@ def test_dns():
             return 3
 
     print("[?] Способ блокировки DNS определить не удалось")
-    return 4
+    return 5
 
 def test_http_access(by_ip=False):
     sites = http_list
