@@ -128,7 +128,7 @@ def _get_url(url, proxy=None, ip=None):
 
     try:
         opened = urllib.request.urlopen(req, timeout=15, cadefault=True)
-        output = opened.readall()
+        output = opened.read()
     except (urllib.error.URLError, socket.error, socket.timeout) as e:
         if 'CERTIFICATE_VERIFY_FAILED' in str(e):
             return (-1, '')
