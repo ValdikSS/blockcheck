@@ -129,7 +129,9 @@ def _get_url(url, proxy=None, ip=None):
     try:
         opened = urllib.request.urlopen(req, timeout=15, cadefault=True)
         output = opened.readall()
-    except (urllib.error.URLError, socket.error, socket.timeout): # we do not expect ssl.CertificateError here
+    except (urllib.error.URLError, socket.error, socket.timeout) as e:
+        if 'CERTIFICATE_VERIFY_FAILED' in str(e):
+            return (-1, '')
         return (0, '')
     return (opened.status, str(output))
 
@@ -243,17 +245,15 @@ def test_https_cert():
     siteresults = []
     for site in sites:
         print("\tОткрываем ", site)
-        try:
-            result = _get_url(site, None)
-            if result[0] < 200:
-                print("[☠] Сайт не открывается")
-            else:
-                print("[✓] Сайт открывается")
-                siteresults.append(True)
-        except ssl.CertificateError:
+        result = _get_url(site, None)
+        if result[0] == -1:
             print("[☠] Сертификат подменяется")
             siteresults.append(False)
-
+        elif result[0] < 200:
+            print("[☠] Сайт не открывается")
+        else:
+            print("[✓] Сайт открывается")
+            siteresults.append(True)
     if all(siteresults):
         # No blocks
         return 0
@@ -304,7 +304,7 @@ def main():
     elif http == 1:
         print("[⚠] У вашего провайдера \"обычный\" DPI.\n",
               "Вам поможет HTTPS/Socks прокси, VPN или Tor.")
-    elif http == 0:
+    elif http == 0 and https == 0:
         print("[☺] Ваш провайдер не блокирует сайты.")
 
     _get_url('http://blockcheck.antizapret.prostovpn.org/index.php?dns=' + str(dns) + '&http=' + str(http) + '&https=' + str(https))
