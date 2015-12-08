@@ -25,7 +25,7 @@ http_list = {'http://gelbooru.com/':
                  {'status': 200, 'lookfor': 'A BitTorrent community', 'ip': '69.165.95.242'},
             }
 
-https_list = {'https://2chru.net/', 'https://e621.net/'}
+https_list = {'https://2chru.cafe/', 'https://e621.net/'}
 
 proxy_addr = 'proxy.antizapret.prostovpn.org:3128'
 google_dns = '8.8.4.4'
