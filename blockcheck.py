@@ -251,18 +251,22 @@ def test_https_cert():
             siteresults.append(False)
         elif result[0] < 200:
             print("[☠] Сайт не открывается")
+            siteresults.append('no')
         else:
             print("[✓] Сайт открывается")
             siteresults.append(True)
-    if all(siteresults):
+    if 'no' in siteresults:
+        # Blocked
+        return 2
+    elif all(siteresults):
         # No blocks
         return 0
     elif any(siteresults):
-        # Blocked
+        # Wrong certificate
         return 1
     else:
         # Unknown result
-        return 2
+        return 3
 
 def main():
     dns = test_dns()
