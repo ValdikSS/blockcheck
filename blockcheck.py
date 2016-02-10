@@ -347,9 +347,12 @@ def test_dpi():
         except Exception as e:
             print("[☠] Ошибка:", repr(e))
         else:
-            if result.find(test['lookfor']) != -1:
+            if result.split("\n")[0].find('200 ') != -1 and result.find(test['lookfor']) != -1:
                 print("[✓] Сайт открывается")
                 dpiresults.append(testname)
+            elif result.split("\n")[0].find('200 ')  -1 and result.find(test['lookfor']) != -1:
+                print("[!] Сайт не открывается, обнаружен пассивный DPI!")
+                dpiresults.append(testname + ' (P)')
             else:
                 print("[☠] Сайт не открывается")
     return dpiresults
