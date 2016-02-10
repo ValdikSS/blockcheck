@@ -21,7 +21,7 @@ http_list = {'http://gelbooru.com/':
                  {'status': 200, 'lookfor': 'Gelbooru- Image View', 'ip': '5.178.68.100'},
              'http://rule34.xxx/':
                  {'status': 200, 'lookfor': 'Rule 34', 'ip': '178.21.23.224'},
-             'http://rule34.xxx/index.php?page=post&s=list&tags=loli':
+             'http://rule34.xxx/index.php?page=post&s=view&id=879177':
                  {'status': 200, 'lookfor': 'Rule 34', 'ip': '178.21.23.224'},
             }
 
