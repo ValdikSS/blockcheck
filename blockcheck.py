@@ -152,6 +152,21 @@ def _get_url(url, proxy=None, ip=None):
         return (0, '')
     return (opened.status, str(output))
 
+def _get_ip_and_isp():
+    # Dirty and cheap
+    try:
+        data = urllib.request.urlopen("http://2ip.ru/", timeout=10).read().decode()
+        ip = data[data.find('<big id="d_clip_button">') + len('<big id="d_clip_button">'):]
+        ip = ip[:ip.find('</big>')]
+        isp = data[data.find('"/isp/') + len('"/isp/'):]
+        isp = isp[:isp.find('"')]
+        isp = urllib.parse.unquote(isp).replace('+', ' ')
+    except:
+        return
+    if len(ip) > 15 or len(isp) > 50:
+        return
+    return (ip, isp)
+
 def _dpi_send(host, port, data, fragment_size=0, fragment_count=0):
     sock = socket.create_connection((host, port), 10)
     if fragment_count:
@@ -324,6 +339,10 @@ def test_dpi():
     return dpiresults
 
 def main():
+    ip_isp = _get_ip_and_isp()
+    if ip_isp:
+        print("IP: {}, провайдер: {}".format(ip_isp[0], ip_isp[1]))
+        print()
     dns = test_dns()
     print()
     if dns == 0:
