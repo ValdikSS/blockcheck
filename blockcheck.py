@@ -352,10 +352,10 @@ def test_dpi():
                 dpiresults.append(testname)
             elif result.split("\n")[0].find('200 ')  -1 and result.find(test['lookfor']) != -1:
                 print("[!] Сайт не открывается, обнаружен пассивный DPI!")
-                dpiresults.append(testname + ' (P)')
+                dpiresults.append('Passive DPI')
             else:
                 print("[☠] Сайт не открывается")
-    return dpiresults
+    return list(set(dpiresults))
 
 def main():
     ip_isp = _get_ip_and_isp()
