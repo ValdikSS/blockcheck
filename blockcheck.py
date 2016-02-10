@@ -163,17 +163,20 @@ def _get_url(url, proxy=None, ip=None):
     return (opened.status, str(output))
 
 def _cut_str(string, begin, end):
-    begin = string.find(begin)
-    end = string.find(end)
-    if begin and end:
-        return string[begin + len(begin):end]
+    cut_begin = string.find(begin)
+    if cut_begin == -1:
+        return
+    cut_end = string[cut_begin:].find(end)
+    if cut_begin == -1:
+        return
+    return string[cut_begin + len(begin):cut_begin + cut_end]
 
 def _get_ip_and_isp():
     # Dirty and cheap
     try:
         data = urllib.request.urlopen("http://2ip.ru/", timeout=10).read().decode()
         ip = _cut_str(data, '<big id="d_clip_button">', '</big>')
-        isp = _cut_str(data, '"/isp/', '"')
+        isp = _cut_str(data, '"/isp/', '">')
         if ip and isp:
             isp = urllib.parse.unquote(isp).replace('+', ' ')
             return (ip, isp)
