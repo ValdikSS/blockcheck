@@ -27,6 +27,23 @@ http_list = {'http://gelbooru.com/':
 
 https_list = {'https://2chru.cafe/', 'https://e621.net/'}
 
+dpi_list =  {'дополнительный пробел после GET':
+                 {'data': "GET  /index.php?page=post&s=view&id=1989610 HTTP/1.0\r\n" + \
+                         "Host: gelbooru.com\r\nConnection: close\r\n\r\n",
+                  'lookfor': 'Gelbooru- Image View', 'ip': '5.178.68.100',
+                  'fragment_size': 0, 'fragment_count': 0},
+             'фрагментирование заголовка':
+                 {'data': "GET /index.php?page=post&s=view&id=1989610 HTTP/1.0\r\n" + \
+                         "Host: gelbooru.com\r\nConnection: close\r\n\r\n",
+                  'lookfor': 'Gelbooru- Image View', 'ip': '5.178.68.100',
+                  'fragment_size': 2, 'fragment_count': 6},
+             'точка в конце домена':
+                 {'data': "GET  /index.php?page=post&s=view&id=1989610 HTTP/1.0\r\n" + \
+                         "Host: gelbooru.com.\r\nConnection: close\r\n\r\n",
+                  'lookfor': 'Gelbooru- Image View', 'ip': '5.178.68.100',
+                  'fragment_size': 0, 'fragment_count': 0},
+            }
+
 proxy_addr = 'proxy.antizapret.prostovpn.org:3128'
 google_dns = '8.8.4.4'
 antizapret_dns = '107.150.11.192'
@@ -134,6 +151,25 @@ def _get_url(url, proxy=None, ip=None):
             return (-1, '')
         return (0, '')
     return (opened.status, str(output))
+
+def _dpi_send(host, port, data, fragment_size=0, fragment_count=0):
+    sock = socket.create_connection((host, port), 10)
+    if fragment_count:
+        sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, True)
+    try:
+        for fragment in range(fragment_count):
+            sock.sendall(data[:fragment_size].encode())
+            data = data[fragment_size:]
+        sock.sendall(data.encode())
+        recvdata = sock.recv(8192)
+        recv = recvdata
+        while recvdata:
+            recvdata = sock.recv(8192)
+            recv += recvdata
+    finally:
+        sock.shutdown(socket.SHUT_RDWR)
+        sock.close()
+    return recv.decode()
 
 def test_dns():
     sites = dns_records_list
@@ -268,6 +304,25 @@ def test_https_cert():
         # Unknown result
         return 3
 
+def test_dpi():
+    print("[O] Тестируем обход DPI")
+
+    dpiresults = []
+    for testname in dpi_list:
+        test = dpi_list[testname]
+        print("\tПробуем способ: " + testname)
+        try:
+            result = _dpi_send(test.get('ip'), 80, test.get('data'), test.get('fragment_size'), test.get('fragment_count'))
+        except Exception as e:
+            print("[☠] Ошибка:", repr(e))
+        else:
+            if result.find(test['lookfor']) != -1:
+                print("[✓] Сайт открывается")
+                dpiresults.append(testname)
+            else:
+                print("[☠] Сайт не открывается")
+    return dpiresults
+
 def main():
     dns = test_dns()
     print()
@@ -278,6 +333,9 @@ def main():
     print()
     https = test_https_cert()
     print()
+    if http in (1, 2):
+        dpi = test_dpi()
+        print()
     print("[!] Результат:")
     if dns == 4:
         print("[⚠] Ваш провайдер блокирует чужие DNS-серверы.\n",
