@@ -352,6 +352,7 @@ def main():
     print()
     https = test_https_cert()
     print()
+    dpi = ''
     if http in (1, 2):
         dpi = test_dpi()
         print()
@@ -390,7 +391,8 @@ def main():
     elif http == 0 and https == 0:
         print("[☺] Ваш провайдер не блокирует сайты.")
 
-    _get_url('http://blockcheck.antizapret.prostovpn.org/index.php?dns=' + str(dns) + '&http=' + str(http) + '&https=' + str(https))
+    _get_url('http://blockcheck.antizapret.prostovpn.org/index.php?dns=' + str(dns) + '&http=' + str(http) +
+             '&https=' + str(https) + '&dpi=' + urllib.parse.quote(','.join(dpi)))
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Определитель типа блокировки сайтов у провайдера.')
