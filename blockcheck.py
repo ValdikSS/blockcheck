@@ -18,11 +18,11 @@ dns_records_list = {"gelbooru.com": ['5.178.68.100'],
 http_list = {'http://gelbooru.com/':
                  {'status': 200, 'lookfor': 'Hentai and Anime Imageboard', 'ip': '5.178.68.100'},
              'http://gelbooru.com/index.php?page=post&s=view&id=1989610':
-                 {'status': 200, 'lookfor': 'Gelbooru- Image View', 'ip': '208.100.25.82'},
-             'http://sukebei.nyaa.se/':
-                 {'status': 200, 'lookfor': 'A BitTorrent community', 'ip': '69.165.95.242'},
-             'http://sukebei.nyaa.se/?page=view&tid=395631':
-                 {'status': 200, 'lookfor': 'A BitTorrent community', 'ip': '69.165.95.242'},
+                 {'status': 200, 'lookfor': 'Gelbooru- Image View', 'ip': '5.178.68.100'},
+             'http://rule34.xxx/':
+                 {'status': 200, 'lookfor': 'Rule 34', 'ip': '178.21.23.224'},
+             'http://rule34.xxx/index.php?page=post&s=list&tags=loli':
+                 {'status': 200, 'lookfor': 'Rule 34', 'ip': '178.21.23.224'},
             }
 
 https_list = {'https://2chru.cafe/', 'https://e621.net/'}
