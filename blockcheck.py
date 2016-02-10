@@ -42,6 +42,16 @@ dpi_list =  {'дополнительный пробел после GET':
                          "Host: gelbooru.com.\r\nConnection: close\r\n\r\n",
                   'lookfor': 'Gelbooru- Image View', 'ip': '5.178.68.100',
                   'fragment_size': 0, 'fragment_count': 0},
+             'заголовок host вместо Host':
+                 {'data': "GET  /index.php?page=post&s=view&id=1989610 HTTP/1.0\r\n" + \
+                         "host: gelbooru.com\r\nConnection: close\r\n\r\n",
+                  'lookfor': 'Gelbooru- Image View', 'ip': '5.178.68.100',
+                  'fragment_size': 0, 'fragment_count': 0},
+             'перенос строки в заголовках в UNIX-стиле':
+                 {'data': "GET  /index.php?page=post&s=view&id=1989610 HTTP/1.0\n" + \
+                         "Host: gelbooru.com\nConnection: close\n\n",
+                  'lookfor': 'Gelbooru- Image View', 'ip': '5.178.68.100',
+                  'fragment_size': 0, 'fragment_count': 0},
             }
 
 proxy_addr = 'proxy.antizapret.prostovpn.org:3128'
