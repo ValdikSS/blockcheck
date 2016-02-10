@@ -365,7 +365,7 @@ def main():
     print()
     https = test_https_cert()
     print()
-    dpi = ''
+    dpi = '-'
     if http in (1, 2):
         dpi = test_dpi()
         print()
