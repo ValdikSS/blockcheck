@@ -27,5 +27,5 @@ BlockCheck
 http://habrahabr.ru/post/229377/ — статистика по провайдерам
 
 ### Установка
-Для работы скрипта требуется модуль dnspython3. Установить его можно из репозитория вашего дистрибутива, или используя pip:
-`pip install -r requirements.txt`
+Для работы скрипта требуется Python 3 с модулем dnspython3. Установить его можно из репозитория вашего дистрибутива, или используя pip:
+`python3 -m pip install -r requirements.txt`
