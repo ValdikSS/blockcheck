@@ -56,7 +56,7 @@ dpi_list =  {'дополнительный пробел после GET':
 
 proxy_addr = 'proxy.antizapret.prostovpn.org:3128'
 google_dns = '8.8.4.4'
-antizapret_dns = '107.150.11.192'
+antizapret_dns = '195.123.209.38'
 
 # End configuration
 
