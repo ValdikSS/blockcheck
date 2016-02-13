@@ -198,7 +198,10 @@ def _dpi_send(host, port, data, fragment_size=0, fragment_count=0):
             recvdata = sock.recv(8192)
             recv += recvdata
     finally:
-        sock.shutdown(socket.SHUT_RDWR)
+        try:
+            sock.shutdown(socket.SHUT_RDWR)
+        except:
+            pass
         sock.close()
     return recv.decode()
 
