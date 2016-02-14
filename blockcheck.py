@@ -176,7 +176,7 @@ def _get_ip_and_isp():
     try:
         data = urllib.request.urlopen("http://2ip.ru/", timeout=10).read().decode()
         ip = _cut_str(data, '<big id="d_clip_button">', '</big>')
-        isp = _cut_str(data, '"/isp/', '">')
+        isp = ' '.join(_cut_str(data, '"/isp/', '</a>').replace('">', '').split())
         if ip and isp:
             isp = urllib.parse.unquote(isp).replace('+', ' ')
             return (ip, isp)
