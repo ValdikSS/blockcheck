@@ -167,7 +167,7 @@ def _cut_str(string, begin, end):
     if cut_begin == -1:
         return
     cut_end = string[cut_begin:].find(end)
-    if cut_begin == -1:
+    if cut_end == -1:
         return
     return string[cut_begin + len(begin):cut_begin + cut_end]
 
