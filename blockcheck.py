@@ -6,6 +6,7 @@ import urllib.parse
 import urllib.error
 import socket
 import ssl
+import sys
 import dns.resolver
 import dns.exception
 
@@ -156,6 +157,15 @@ def _get_url(url, proxy=None, ip=None):
     try:
         opened = urllib.request.urlopen(req, timeout=15, cadefault=True)
         output = opened.read()
+    except TypeError as e:
+        if 'cadefault' in str(e):
+            try:
+                opened = urllib.request.urlopen(req, timeout=15, cafile="/etc/ssl/certs/ca-certificates.crt")
+                output = opened.read()
+            except FileNotFoundError:
+                print("[☠] У вас слишком старая версия Python, которая не поддерживает проверку сертификатов.",
+                      "Установите Python 3.3 или новее.")
+                sys.exit(1)
     except (urllib.error.URLError, socket.error, socket.timeout) as e:
         if 'CERTIFICATE_VERIFY_FAILED' in str(e):
             return (-1, '')
