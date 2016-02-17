@@ -58,6 +58,8 @@ dpi_list =  {'дополнительный пробел после GET':
 proxy_addr = 'proxy.antizapret.prostovpn.org:3128'
 google_dns = '8.8.4.4'
 antizapret_dns = '195.123.209.38'
+isup_server = 'isup.me'
+isup_fmt = 'http://isup.me/{}'
 
 # End configuration
 
@@ -214,6 +216,41 @@ def _dpi_send(host, port, data, fragment_size=0, fragment_count=0):
             pass
         sock.close()
     return recv.decode()
+
+def check_isup(page_url):
+    """
+    Check if the site is up using isup.me or whatever is set in
+    `isup_fmt`. Return True if it's up, False if it's not, None
+    if isup.me is itself unaccessible or there was an error while
+    getting the response.
+
+    `page_url` must be a string and presumed to be sanitized (but
+    doesn't have to be the domain and nothing else, isup.me accepts
+    full URLs)
+    """
+    #Note that isup.me doesn't use HTTPS and therefore the ISP can slip
+    #false information (and if it gets blocked, the error page by the ISP can
+    #happen to have the markers we look for). But we're disregarding this
+    #possibility for now.
+    print("Проверяю доступность через {}".format(isup_server))
+
+    url = isup_fmt.format(page_url)
+    status, output = _get_url(url)
+    if status in (0, -1):
+        print("[⁇] Ошибка при соединении с {}".format(isup_server))
+        return None
+    elif status != 200:
+        print("[⁇] Неожиданный ответ от {}, код {}".format(isup_server, status))
+        return None
+    elif output.find("It\\'s just you") >= 0:
+        print("[☠] Сайт доступен, проблемы только у нас")
+        return True
+    elif output.find("looks down from here") >= 0:
+        print("[⁇] Сайт недоступен, видимо, он лежит")
+        return False
+    else:
+        print("[⁇] Ответ от {} не удалось распознать".format(isup_server))
+        return None
 
 def test_dns():
     sites = dns_records_list
