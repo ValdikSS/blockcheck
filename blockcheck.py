@@ -60,6 +60,7 @@ google_dns = '8.8.4.4'
 antizapret_dns = '195.123.209.38'
 isup_server = 'isup.me'
 isup_fmt = 'http://isup.me/{}'
+disable_isup = False #If true, presume that all sites are available
 
 # End configuration
 
@@ -232,6 +233,9 @@ def check_isup(page_url):
     #false information (and if it gets blocked, the error page by the ISP can
     #happen to have the markers we look for). But we're disregarding this
     #possibility for now.
+    if disable_isup:
+        return True
+
     print("Проверяю доступность через {}".format(isup_server))
 
     url = isup_fmt.format(page_url)
@@ -246,7 +250,7 @@ def check_isup(page_url):
         print("[☠] Сайт доступен, проблемы только у нас")
         return True
     elif output.find("looks down from here") >= 0:
-        print("[✗] Сайт недоступен, видимо, он лежит")
+        print("[✗] Сайт недоступен, видимо, он не работает")
         return False
     else:
         print("[⁇] Ответ от {} не удалось распознать".format(isup_server))
@@ -472,9 +476,16 @@ def main():
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Определитель типа блокировки сайтов у провайдера.')
     parser.add_argument('--console', action='store_true', help='Консольный режим. Отключает Tkinter GUI.')
+    parser.add_argument('--no-isup', action='store_true',
+                            help='Не проверять доступность сайтов через {}' \
+                                    .format(isup_server))
     args = parser.parse_args()
+
     if args.console:
         tkusable = False
+
+    if args.no_isup:
+        disable_isup = True
 
     if tkusable:
         root = tk.Tk()
