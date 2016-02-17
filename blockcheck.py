@@ -371,6 +371,12 @@ def test_dpi():
     return list(set(dpiresults))
 
 def main():
+    #Check Python version
+    if sys.version_info[0] == 3 and sys.version_info[1] < 3:
+        print("ОШИБКА! Слишком старая версия Python: у вас {}.{}, требуется",
+              "3.3 или новее".format(sys.version_info[0], sys.version_info[1]))
+        return
+
     ip_isp = _get_ip_and_isp()
     if ip_isp:
         print("IP: {}, провайдер: {}".format(ip_isp[0], ip_isp[1]))
