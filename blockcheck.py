@@ -246,7 +246,7 @@ def check_isup(page_url):
         print("[☠] Сайт доступен, проблемы только у нас")
         return True
     elif output.find("looks down from here") >= 0:
-        print("[⁇] Сайт недоступен, видимо, он лежит")
+        print("[✗] Сайт недоступен, видимо, он лежит")
         return False
     else:
         print("[⁇] Ответ от {} не удалось распознать".format(isup_server))
