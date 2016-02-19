@@ -175,6 +175,9 @@ def _get_url(url, proxy=None, ip=None):
         if 'CERTIFICATE_VERIFY_FAILED' in str(e):
             return (-1, '')
         return (0, '')
+    except Exception as e:
+        print("[☠] Неизвестная ошибка:", repr(e))
+        return (0, '')
     return (opened.status, str(output))
 
 def _cut_str(string, begin, end):
