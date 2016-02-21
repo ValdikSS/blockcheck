@@ -231,8 +231,8 @@ def check_isup(page_url):
     """
     #Note that isup.me doesn't use HTTPS and therefore the ISP can slip
     #false information (and if it gets blocked, the error page by the ISP can
-    #happen to have the markers we look for). But we're disregarding this
-    #possibility for now.
+    #happen to have the markers we look for). We should inform the user about
+    #this possibility when showing results.
     if disable_isup:
         return True
 
@@ -317,46 +317,79 @@ def test_dns():
     print("[?] Способ блокировки DNS определить не удалось")
     return 5
 
+HTTP_ACCESS_NOBLOCKS = 0
+HTTP_ACCESS_IPBLOCK = 1
+HTTP_ACCESS_IPDPI = 2
+HTTP_ACCESS_FULLDPI = 3
+
+HTTP_ISUP_ALLUP = 0
+HTTP_ISUP_SOMEDOWN = 1
+HTTP_ISUP_ALLDOWN = 2
+HTTP_ISUP_BROKEN = 3
+
 def test_http_access(by_ip=False):
+    """
+    Test plain HTTP access and return two values:
+
+    1. The result - one of the HTTP_ACCESS_* constants
+    2. isup.me info - one of the HTTP_ISUP_* constants
+    """
     sites = http_list
     proxy = proxy_addr
 
     print("[O] Тестируем HTTP")
 
-    siteresults = []
+    successes = 0
+    successes_proxy = 0
+    down = 0
+    blocks = 0
+    blocks_ambiguous = 0
+
     for site in sites:
-        print("\tОткрываем ", site)
+        print("=== Открываем ", site)
         result = _get_url(site, ip=sites[site].get('ip') if by_ip else None)
         if result[0] == sites[site]['status'] and result[1].find(sites[site]['lookfor']) != -1:
             print("[✓] Сайт открывается")
-            siteresults.append(True)
+            successes += 1
         else:
-            print("[☠] Сайт не открывается")
-            siteresults.append(False)
+            print("[☠] Сайт не открывается, пробуем через прокси")
+            result_proxy = _get_url(site, proxy)
+            if result_proxy[0] == sites[site]['status'] and result_proxy[1].find(sites[site]['lookfor']) != -1:
+                print("[✓] Сайт открывается")
+                successes_proxy += 1
+            else:
+                print("[☠] Сайт не открывается")
+                isup = check_isup(site)
+                if isup is None:
+                    blocks_ambiguous += 1
+                elif isup:
+                    blocks += 1
+                else:
+                    down += 1
 
-    siteresults_proxy = []
-    for site in sites:
-        print("\tОткрываем через прокси ", site)
-        result_proxy = _get_url(site, proxy)
-        if result_proxy[0] == sites[site]['status'] and result_proxy[1].find(sites[site]['lookfor']) != -1:
-            print("[✓] Сайт открывается")
-            siteresults_proxy.append(True)
-        else:
-            print("[☠] Сайт не открывается")
-            siteresults_proxy.append(False)
+    all_sites = len(sites)
 
-    if all(siteresults):
-        # No blocks
-        return 0
-    elif any(siteresults) and all(siteresults_proxy):
-        # IP-DPI
-        return 1
-    elif any(siteresults) and any(siteresults_proxy):
-        # Full-DPI
-        return 2
+    #Result without isup.me
+    if successes == all_sites:
+        result = HTTP_ACCESS_NOBLOCKS
+    elif successes != 0 and successes + successes_proxy == all_sites:
+        result = HTTP_ACCESS_IPDPI
+    elif successes != 0 and successes_proxy != 0:
+        result = HTTP_ACCESS_FULLDPI
     else:
-        # IP
-        return 3
+        result = HTTP_ACCESS_IPBLOCK
+
+    #isup.me info
+    if blocks_ambiguous > 0:
+        isup = HTTP_ISUP_BROKEN
+    elif down == all_sites:
+        isup = HTTP_ISUP_ALLDOWN
+    elif down > 0:
+        isup = HTTP_ISUP_SOMEDOWN
+    else:
+        isup = HTTP_ISUP_ALLUP
+
+    return result, isup
 
 def test_https_cert():
     sites = https_list
@@ -365,14 +398,15 @@ def test_https_cert():
 
     siteresults = []
     for site in sites:
-        print("\tОткрываем ", site)
+        print("=== Открываем ", site)
         result = _get_url(site, None)
         if result[0] == -1:
             print("[☠] Сертификат подменяется")
             siteresults.append(False)
         elif result[0] < 200:
             print("[☠] Сайт не открывается")
-            siteresults.append('no')
+            if check_isup(site):
+                siteresults.append('no')
         else:
             print("[✓] Сайт открывается")
             siteresults.append(True)
@@ -424,10 +458,7 @@ def main():
         print()
     dns = test_dns()
     print()
-    if dns == 0:
-        http = test_http_access(False)
-    else:
-        http = test_http_access(True)
+    http, http_isup = test_http_access((dns != 0))
     print()
     https = test_https_cert()
     print()
@@ -455,20 +486,55 @@ def main():
 
     if https == 1:
         print("[⚠] Ваш провайдер подменяет HTTPS-сертификат на свой.")
-    if https == 2:
+    elif https == 2:
         print("[⚠] Ваш провайдер блокирует доступ к HTTPS-сайтам.")
+    elif https == 3:
+        print("[⚠] Доступ по HTTPS проверить не удалось, повторите тест позже.")
 
-    if http == 3:
-        print("[⚠] Ваш провайдер блокирует по IP-адресу.\n",
-              "Используйте любой способ обхода блокировок.")
-    elif http == 2:
-        print("[⚠] У вашего провайдера \"полный\" DPI. Он отслеживает ссылки даже внутри прокси, поэтому вам следует " + \
-              "использовать любое шифрованное соединение, например, VPN или Tor.")
-    elif http == 1:
-        print("[⚠] У вашего провайдера \"обычный\" DPI.\n",
-              "Вам поможет HTTPS/Socks прокси, VPN или Tor.")
-    elif http == 0 and https == 0:
-        print("[☺] Ваш провайдер не блокирует сайты.")
+    if http_isup == HTTP_ISUP_BROKEN:
+        print("[⚠] {0} даёт неожиданные ответы или недоступен. Рекомендуем " \
+              "повторить тест, когда он начнёт работать. Возможно, эта " \
+              "версия программы устарела. Возможно (но маловероятно), " \
+              "что сам {0} уже занесён в чёрный список".format(isup_server))
+    elif http_isup == HTTP_ISUP_ALLDOWN:
+        print("[⚠] Согласно {}, все проверяемые сайты сейчас не работают. " \
+              "Повторите тест, когда начнут.".format(isup_server))
+    elif http_isup == HTTP_ISUP_SOMEDOWN:
+        print("[⚠] Если верить {}, некоторые из проверяемых сайтов сейчас " \
+              "не работают. Повторите тест, когда начнут.\n\nТеоретически, "
+              "ваш провайдер может подделывать эту информацию, но только если "
+              "использует очень сложный DPI. На практике такое ещё не "
+              "встречалось, но если это так, то вам следует использовать "
+              "шифрованное соединение, например, VPN или Tor.\n\n")
+    elif http_isup != HTTP_ISUP_ALLUP:
+        print("[⚠] ВНУТРЕННЯЯ ОШИБКА ПРОГРАММЫ, http_isup = {}".format(http_isup))
+
+    def print_http_result(symbol, message):
+        if http_isup == HTTP_ISUP_ALLUP:
+            print("{} {}".format(symbol, message))
+        else:
+            def print_http_result(symbol, message):
+                #ACHTUNG: translating this program into other languages
+                #might be tricky. Not into English, though.
+                print("{} Если проигнорировать {}, то {}"\
+                        .format(symbol, isup_server,
+                                message[0].lower() + message[1:]))
+
+    if http == HTTP_ACCESS_IPBLOCK:
+        print_http_result("[⚠]", "Ваш провайдер блокирует по IP-адресу. " \
+                                 "Используйте любой способ обхода блокировок.")
+    elif http == HTTP_ACCESS_FULLDPI:
+        print_http_result("[⚠]", "У вашего провайдера \"полный\" DPI. Он " \
+                                 "отслеживает ссылки даже внутри прокси, " \
+                                 "поэтому вам следует использовать любое " \
+                                 "шифрованное соединение, например, " \
+                                 "VPN или Tor.")
+    elif http == HTTP_ACCESS_IPDPI:
+        print_http_result("[⚠]", "У вашего провайдера \"обычный\" DPI. " \
+                                 "Вам поможет HTTPS/Socks прокси, VPN или Tor.")
+    elif http_isup == HTTP_ISUP_ALLUP and http == HTTP_ACCESS_NOBLOCKS \
+            and https == 0:
+        print_http_result("[☺]", "Ваш провайдер не блокирует сайты.")
 
     _get_url('http://blockcheck.antizapret.prostovpn.org/index.php?dns=' + str(dns) + '&http=' + str(http) +
              '&https=' + str(https) + '&dpi=' + urllib.parse.quote(','.join(dpi)))
