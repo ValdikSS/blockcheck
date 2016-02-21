@@ -355,10 +355,10 @@ def test_http_access(by_ip=False):
             print("[☠] Сайт не открывается, пробуем через прокси")
             result_proxy = _get_url(site, proxy)
             if result_proxy[0] == sites[site]['status'] and result_proxy[1].find(sites[site]['lookfor']) != -1:
-                print("[✓] Сайт открывается")
+                print("[✓] Сайт открывается через прокси")
                 successes_proxy += 1
             else:
-                print("[☠] Сайт не открывается")
+                print("[☠] Сайт не открывается через прокси")
                 isup = check_isup(site)
                 if isup is None:
                     blocks_ambiguous += 1
@@ -393,6 +393,7 @@ def test_http_access(by_ip=False):
 
 def test_https_cert():
     sites = https_list
+    isup_problems = False
 
     print("[O] Тестируем HTTPS")
 
@@ -407,12 +408,16 @@ def test_https_cert():
             print("[☠] Сайт не открывается")
             if check_isup(site):
                 siteresults.append('no')
+            else:
+                isup_problems = True
         else:
             print("[✓] Сайт открывается")
             siteresults.append(True)
     if 'no' in siteresults:
         # Blocked
         return 2
+    elif isup_problems:
+        return 3
     elif all(siteresults):
         # No blocks
         return 0
