@@ -221,7 +221,7 @@ def _dpi_send(host, port, data, fragment_size=0, fragment_count=0):
         except:
             pass
         sock.close()
-    return recv.decode()
+    return recv.decode(errors='replace')
 
 def test_dns():
     sites = dns_records_list
