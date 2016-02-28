@@ -24,6 +24,8 @@ http_list = {'http://gelbooru.com/':
                  {'status': 200, 'lookfor': 'Rule 34', 'ip': '178.21.23.224'},
              'http://rule34.xxx/index.php?page=post&s=view&id=879177':
                  {'status': 200, 'lookfor': 'Rule 34', 'ip': '178.21.23.224'},
+             'http://rutracker.org/forum/index.php':
+                 {'status': 200, 'lookfor': 'static.rutracker.org', 'ip': '195.82.146.214'},
             }
 
 https_list = {'https://2chru.cafe/', 'https://e621.net/'}
