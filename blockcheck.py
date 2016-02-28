@@ -30,37 +30,13 @@ http_list = {'http://gelbooru.com/':
 
 https_list = {'https://2chru.cafe/', 'https://e621.net/'}
 
-dpi_list =  {'дополнительный пробел после GET':
-                 {'data': "GET  /index.php?page=post&s=view&id=1989610 HTTP/1.0\r\n" + \
-                         "Host: gelbooru.com\r\nConnection: close\r\n\r\n",
-                  'lookfor': 'Gelbooru- Image View', 'ip': '5.178.68.100',
-                  'fragment_size': 0, 'fragment_count': 0},
-             'фрагментирование заголовка':
-                 {'data': "GET /index.php?page=post&s=view&id=1989610 HTTP/1.0\r\n" + \
-                         "Host: gelbooru.com\r\nConnection: close\r\n\r\n",
-                  'lookfor': 'Gelbooru- Image View', 'ip': '5.178.68.100',
-                  'fragment_size': 2, 'fragment_count': 6},
-             'точка в конце домена':
-                 {'data': "GET /index.php?page=post&s=view&id=1989610 HTTP/1.0\r\n" + \
-                         "Host: gelbooru.com.\r\nConnection: close\r\n\r\n",
-                  'lookfor': 'Gelbooru- Image View', 'ip': '5.178.68.100',
-                  'fragment_size': 0, 'fragment_count': 0},
-             'заголовок host вместо Host':
-                 {'data': "GET /index.php?page=post&s=view&id=1989610 HTTP/1.0\r\n" + \
-                         "host: gelbooru.com\r\nConnection: close\r\n\r\n",
-                  'lookfor': 'Gelbooru- Image View', 'ip': '5.178.68.100',
-                  'fragment_size': 0, 'fragment_count': 0},
-             'перенос строки в заголовках в UNIX-стиле':
-                 {'data': "GET /index.php?page=post&s=view&id=1989610 HTTP/1.0\n" + \
-                         "Host: gelbooru.com\nConnection: close\n\n",
-                  'lookfor': 'Gelbooru- Image View', 'ip': '5.178.68.100',
-                  'fragment_size': 0, 'fragment_count': 0},
-             'необычный порядок заголовков':
-                 {'data': "GET /index.php?page=post&s=view&id=1989610 HTTP/1.0\r\n" + \
-                         "Connection: close\r\nHost: gelbooru.com\r\n\r\n",
-                  'lookfor': 'Gelbooru- Image View', 'ip': '5.178.68.100',
-                  'fragment_size': 0, 'fragment_count': 0},
-            }
+dpi_list =   {'rutracker.org':
+                {'host': 'rutracker.org', 'urn': '/forum/index.php',
+                 'lookfor': 'static.rutracker.org', 'ip': '195.82.146.214'},
+              'gelbooru.com':
+                {'host': 'gelbooru.com', 'urn': '/index.php?page=post&s=view&id=1989610',
+                 'lookfor': 'Gelbooru- Image View', 'ip': '5.178.68.100'},
+             }
 
 proxy_addr = 'proxy.antizapret.prostovpn.org:3128'
 google_dns = '8.8.4.4'
@@ -225,6 +201,41 @@ def _dpi_send(host, port, data, fragment_size=0, fragment_count=0):
         sock.close()
     return recv.decode(errors='replace')
 
+def _dpi_build_tests(host, urn, ip, lookfor):
+    dpi_built_list = \
+        {'дополнительный пробел после GET':
+                {'data': "GET  {} HTTP/1.0\r\n".format(urn) + \
+                        "Host: {}\r\nConnection: close\r\n\r\n".format(host),
+                'lookfor': lookfor, 'ip': ip,
+                'fragment_size': 0, 'fragment_count': 0},
+            'фрагментирование заголовка':
+                {'data': "GET {} HTTP/1.0\r\n".format(urn) + \
+                        "Host: {}\r\nConnection: close\r\n\r\n".format(host),
+                'lookfor': lookfor, 'ip': ip,
+                'fragment_size': 2, 'fragment_count': 6},
+            'точка в конце домена':
+                {'data': "GET {} HTTP/1.0\r\n".format(urn) + \
+                        "Host: {}.\r\nConnection: close\r\n\r\n".format(host),
+                'lookfor': lookfor, 'ip': ip,
+                'fragment_size': 0, 'fragment_count': 0},
+            'заголовок host вместо Host':
+                {'data': "GET {} HTTP/1.0\r\n".format(urn) + \
+                        "host: {}\r\nConnection: close\r\n\r\n".format(host),
+                'lookfor': lookfor, 'ip': ip,
+                'fragment_size': 0, 'fragment_count': 0},
+            'перенос строки в заголовках в UNIX-стиле':
+                {'data': "GET {} HTTP/1.0\n".format(urn) + \
+                        "Host: {}\nConnection: close\n\n".format(host),
+                'lookfor': lookfor, 'ip': ip,
+                'fragment_size': 0, 'fragment_count': 0},
+            'необычный порядок заголовков':
+                {'data': "GET {} HTTP/1.0\r\n".format(urn) + \
+                        "Connection: close\r\nHost: {}\r\n\r\n".format(host),
+                'lookfor': lookfor, 'ip': ip,
+                'fragment_size': 0, 'fragment_count': 0},
+        }
+    return dpi_built_list
+
 def test_dns():
     sites = dns_records_list
     sites_list = list(sites.keys())
@@ -362,22 +373,25 @@ def test_dpi():
     print("[O] Тестируем обход DPI")
 
     dpiresults = []
-    for testname in dpi_list:
-        test = dpi_list[testname]
-        print("\tПробуем способ: " + testname)
-        try:
-            result = _dpi_send(test.get('ip'), 80, test.get('data'), test.get('fragment_size'), test.get('fragment_count'))
-        except Exception as e:
-            print("[☠] Ошибка:", repr(e))
-        else:
-            if result.split("\n")[0].find('200 ') != -1 and result.find(test['lookfor']) != -1:
-                print("[✓] Сайт открывается")
-                dpiresults.append(testname)
-            elif result.split("\n")[0].find('200 ')  -1 and result.find(test['lookfor']) != -1:
-                print("[!] Сайт не открывается, обнаружен пассивный DPI!")
-                dpiresults.append('Passive DPI')
+    for dpisite in dpi_list:
+        site = dpi_list[dpisite]
+        dpi_built_tests = _dpi_build_tests(site['host'], site['urn'], site['ip'], site['lookfor'])
+        for testname in dpi_built_tests:
+            test = dpi_built_tests[testname]
+            print("\tПробуем способ «{}» на {}".format(testname, dpisite))
+            try:
+                result = _dpi_send(test.get('ip'), 80, test.get('data'), test.get('fragment_size'), test.get('fragment_count'))
+            except Exception as e:
+                print("[☠] Ошибка:", repr(e))
             else:
-                print("[☠] Сайт не открывается")
+                if result.split("\n")[0].find('200 ') != -1 and result.find(test['lookfor']) != -1:
+                    print("[✓] Сайт открывается")
+                    dpiresults.append(testname)
+                elif result.split("\n")[0].find('200 ')  -1 and result.find(test['lookfor']) != -1:
+                    print("[!] Сайт не открывается, обнаружен пассивный DPI!")
+                    dpiresults.append('Passive DPI')
+                else:
+                    print("[☠] Сайт не открывается")
     return list(set(dpiresults))
 
 def main():
