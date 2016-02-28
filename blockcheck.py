@@ -149,6 +149,8 @@ def _get_url(url, proxy=None, ip=None):
                 print("[☠] У вас слишком старая версия Python, которая не поддерживает проверку сертификатов.",
                       "Установите Python 3.3 или новее.")
                 sys.exit(1)
+    except ssl.CertificateError:
+        return (-1, '')
     except (urllib.error.URLError, socket.error, socket.timeout) as e:
         if 'CERTIFICATE_VERIFY_FAILED' in str(e):
             return (-1, '')
