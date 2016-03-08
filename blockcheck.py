@@ -25,14 +25,14 @@ http_list = {'http://gelbooru.com/':
              'http://rule34.xxx/index.php?page=post&s=view&id=879177':
                  {'status': 200, 'lookfor': 'Rule 34', 'ip': '178.21.23.224'},
              'http://rutracker.org/forum/index.php':
-                 {'status': 200, 'lookfor': 'static.rutracker.org', 'ip': '195.82.146.214'},
+                 {'status': 200, 'lookfor': 'static.rutracker.', 'ip': '195.82.146.214'},
             }
 
 https_list = {'https://2chru.cafe/', 'https://e621.net/'}
 
 dpi_list =   {'rutracker.org':
                 {'host': 'rutracker.org', 'urn': '/forum/index.php',
-                 'lookfor': 'static.rutracker.org', 'ip': '195.82.146.214'},
+                 'lookfor': 'static.rutracker.', 'ip': '195.82.146.214'},
               'gelbooru.com':
                 {'host': 'gelbooru.com', 'urn': '/index.php?page=post&s=view&id=1989610',
                  'lookfor': 'Gelbooru- Image View', 'ip': '5.178.68.100'},
