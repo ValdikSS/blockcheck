@@ -121,6 +121,14 @@ def _get_a_records(sitelist, dnsserver=None):
 
     return sorted(result)
 
+def _decode_bytes(input_bytes):
+    output = input_bytes
+    try:
+        output = input_bytes.decode(errors='replace')
+    except:
+        pass
+    return output
+
 def _get_url(url, proxy=None, ip=None):
     if ip:
         parsed_url = list(urllib.parse.urlsplit(url))
@@ -158,7 +166,7 @@ def _get_url(url, proxy=None, ip=None):
     except Exception as e:
         print("[☠] Неизвестная ошибка:", repr(e))
         return (0, '')
-    return (opened.status, str(output))
+    return (opened.status, _decode_bytes(output))
 
 def _cut_str(string, begin, end):
     cut_begin = string.find(begin)
@@ -172,7 +180,7 @@ def _cut_str(string, begin, end):
 def _get_ip_and_isp():
     # Dirty and cheap
     try:
-        data = urllib.request.urlopen("http://2ip.ru/", timeout=10).read().decode()
+        data = _decode_bytes(urllib.request.urlopen("http://2ip.ru/", timeout=10).read())
         ip = _cut_str(data, '<big id="d_clip_button">', '</big>')
         isp = ' '.join(_cut_str(data, '"/isp/', '</a>').replace('">', '').split())
         if ip and isp:
@@ -201,7 +209,7 @@ def _dpi_send(host, port, data, fragment_size=0, fragment_count=0):
         except:
             pass
         sock.close()
-    return recv.decode(errors='replace')
+    return _decode_bytes(recv)
 
 def _dpi_build_tests(host, urn, ip, lookfor):
     dpi_built_list = \
@@ -247,7 +255,7 @@ def test_dns():
     try:
         remote_dns = urllib.request.urlopen("http://blockcheck.antizapret.prostovpn.org/getdns.php",
             timeout=10).read()
-        remote_dns = remote_dns.decode('utf-8').split()
+        remote_dns = _decode_bytes(remote_dns).split()
         print("\tЭталонные адреса:\t\t", str(remote_dns))
     except:
         remote_dns = None
