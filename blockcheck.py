@@ -262,7 +262,7 @@ def check_isup(page_url):
     if disable_isup:
         return True
 
-    print("    Проверяю доступность через {}".format(isup_server))
+    print("\tПроверяем доступность через {}".format(isup_server))
 
     url = isup_fmt.format(page_url)
     status, output = _get_url(url)
@@ -279,7 +279,7 @@ def check_isup(page_url):
         print("[✗] Сайт недоступен, видимо, он не работает")
         return False
     else:
-        print("[⁇] Ответ от {} не удалось распознать".format(isup_server))
+        print("[⁇] Не удалось распознать ответ от {}".format(isup_server))
         return None
 
 def test_dns():
@@ -372,7 +372,7 @@ def test_http_access(by_ip=False):
     blocks_ambiguous = 0
 
     for site in sites:
-        print("=== Открываем ", site)
+        print("\tОткрываем ", site)
         result = _get_url(site, ip=sites[site].get('ip') if by_ip else None)
         if result[0] == sites[site]['status'] and result[1].find(sites[site]['lookfor']) != -1:
             print("[✓] Сайт открывается")
@@ -398,9 +398,9 @@ def test_http_access(by_ip=False):
     #Result without isup.me
     if successes == all_sites:
         result = HTTP_ACCESS_NOBLOCKS
-    elif successes != 0 and successes + successes_proxy == all_sites:
+    elif successes > 0 and successes + successes_proxy == all_sites:
         result = HTTP_ACCESS_IPDPI
-    elif successes != 0 and successes_proxy != 0:
+    elif successes > 0:
         result = HTTP_ACCESS_FULLDPI
     else:
         result = HTTP_ACCESS_IPBLOCK
@@ -425,7 +425,7 @@ def test_https_cert():
 
     siteresults = []
     for site in sites:
-        print("=== Открываем ", site)
+        print("\tОткрываем ", site)
         result = _get_url(site, None)
         if result[0] == -1:
             print("[☠] Сертификат подменяется")
@@ -521,17 +521,15 @@ def main():
         print("[⚠] {0} даёт неожиданные ответы или недоступен. Рекомендуем " \
               "повторить тест, когда он начнёт работать. Возможно, эта " \
               "версия программы устарела. Возможно (но маловероятно), " \
-              "что сам {0} уже занесён в чёрный список".format(isup_server))
+              "что сам {0} уже занесён в чёрный список.".format(isup_server))
     elif http_isup == HTTP_ISUP_ALLDOWN:
         print("[⚠] Согласно {}, все проверяемые сайты сейчас не работают. " \
-              "Повторите тест, когда начнут.".format(isup_server))
+              "Убедитесь, что вы используете последнюю версию программы, и " \
+              "повторите тест позже.".format(isup_server))
     elif http_isup == HTTP_ISUP_SOMEDOWN:
-        print("[⚠] Если верить {}, некоторые из проверяемых сайтов сейчас " \
-              "не работают. Повторите тест, когда начнут.\n\nТеоретически, "
-              "ваш провайдер может подделывать эту информацию, но только если "
-              "использует очень сложный DPI. На практике такое ещё не "
-              "встречалось, но если это так, то вам следует использовать "
-              "шифрованное соединение, например, VPN или Tor.\n\n")
+        print("[⚠] Согласно {}, часть проверяемых сайтов сейчас не работает. " \
+              "Убедитесь, что вы используете последнюю версию программы, и " \
+              "повторите тест позже.".format(isup_server))
     elif http_isup != HTTP_ISUP_ALLUP:
         print("[⚠] ВНУТРЕННЯЯ ОШИБКА ПРОГРАММЫ, http_isup = {}".format(http_isup))
 
@@ -539,12 +537,10 @@ def main():
         if http_isup == HTTP_ISUP_ALLUP:
             print("{} {}".format(symbol, message))
         else:
-            def print_http_result(symbol, message):
-                #ACHTUNG: translating this program into other languages
-                #might be tricky. Not into English, though.
-                print("{} Если проигнорировать {}, то {}"\
-                        .format(symbol, isup_server,
-                                message[0].lower() + message[1:]))
+            #ACHTUNG: translating this program into other languages
+            #might be tricky. Not into English, though.
+            print("{} Если проигнорировать {}, то {}" \
+                .format(symbol, isup_server, message[0].lower() + message[1:]))
 
     if http == HTTP_ACCESS_IPBLOCK:
         print_http_result("[⚠]", "Ваш провайдер блокирует по IP-адресу. " \
