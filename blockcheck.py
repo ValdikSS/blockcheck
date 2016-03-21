@@ -122,12 +122,7 @@ def _get_a_records(sitelist, dnsserver=None):
     return sorted(result)
 
 def _decode_bytes(input_bytes):
-    output = input_bytes
-    try:
-        output = input_bytes.decode(errors='replace')
-    except:
-        pass
-    return output
+    return input_bytes.decode(errors='replace')
 
 def _get_url(url, proxy=None, ip=None):
     if ip:
