@@ -392,7 +392,7 @@ def test_dpi():
                 if result.split("\n")[0].find('200 ') != -1 and result.find(test['lookfor']) != -1:
                     print("[✓] Сайт открывается")
                     dpiresults.append(testname)
-                elif result.split("\n")[0].find('200 ')  -1 and result.find(test['lookfor']) != -1:
+                elif result.split("\n")[0].find('200 ') == -1 and result.find(test['lookfor']) != -1:
                     print("[!] Сайт не открывается, обнаружен пассивный DPI!")
                     dpiresults.append('Passive DPI')
                 else:
