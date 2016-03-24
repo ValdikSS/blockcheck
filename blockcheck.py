@@ -259,12 +259,22 @@ def check_isup(page_url):
     `page_url` must be a string and presumed to be sanitized (but
     doesn't have to be the domain and nothing else, isup.me accepts
     full URLs)
+
+    isup.me can't check HTTPS URL yet, so we return True for them.
+    It's still useful to call check_isup even on HTTPS URLs for two
+    reasons: because we may switch to a service that can can check them
+    in the future and because check_isup will output a notification for
+    the user.
     """
     #Note that isup.me doesn't use HTTPS and therefore the ISP can slip
     #false information (and if it gets blocked, the error page by the ISP can
     #happen to have the markers we look for). We should inform the user about
     #this possibility when showing results.
     if disable_isup:
+        return True
+    elif page_url.startswith("https://"):
+        print("[☠] {} не поддерживает HTTPS, считаем, что сайт работает, "
+              "а проблемы только у нас".format(isup_server))
         return True
 
     print("\tПроверяем доступность через {}".format(isup_server))
@@ -383,13 +393,21 @@ def test_http_access(by_ip=False):
             print("[✓] Сайт открывается")
             successes += 1
         else:
-            print("[☠] Сайт не открывается, пробуем через прокси")
+            if result[0]  == sites[site]['status']:
+                print("[☠] Получен неожиданный ответ, скорее всего, "
+                      "страница-заглушка провайдера. Пробуем через прокси.")
+            else:
+                print("[☠] Сайт не открывается, пробуем через прокси")
             result_proxy = _get_url(site, proxy)
             if result_proxy[0] == sites[site]['status'] and result_proxy[1].find(sites[site]['lookfor']) != -1:
                 print("[✓] Сайт открывается через прокси")
                 successes_proxy += 1
             else:
-                print("[☠] Сайт не открывается через прокси")
+                if result_proxy[0] == sites[site]['status']:
+                    print("[☠] Получен неожиданный ответ, скорее всего, "
+                          "страница-заглушка провайдера. Считаем заблокированным.")
+                else:
+                    print("[☠] Сайт не открывается через прокси")
                 isup = check_isup(site)
                 if isup is None:
                     blocks_ambiguous += 1
