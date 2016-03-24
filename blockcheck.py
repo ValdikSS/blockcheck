@@ -388,13 +388,21 @@ def test_http_access(by_ip=False):
             print("[✓] Сайт открывается")
             successes += 1
         else:
-            print("[☠] Сайт не открывается, пробуем через прокси")
+            if result[0]  == sites[site]['status']:
+                print("[☠] Получен неожиданный ответ, скорее всего, "
+                      "страница-заглушка провайдера. Пробуем через прокси.")
+            else:
+                print("[☠] Сайт не открывается, пробуем через прокси")
             result_proxy = _get_url(site, proxy)
             if result_proxy[0] == sites[site]['status'] and result_proxy[1].find(sites[site]['lookfor']) != -1:
                 print("[✓] Сайт открывается через прокси")
                 successes_proxy += 1
             else:
-                print("[☠] Сайт не открывается через прокси")
+                if result_proxy[0] == sites[site]['status']:
+                    print("[☠] Получен неожиданный ответ, скорее всего, "
+                          "страница-заглушка провайдера. Считаем заблокированным.")
+                else:
+                    print("[☠] Сайт не открывается через прокси")
                 isup = check_isup(site)
                 if isup is None:
                     blocks_ambiguous += 1
