@@ -400,6 +400,7 @@ def test_dpi():
     return list(set(dpiresults))
 
 def main():
+    print("BlockCheck v0.0.8")
     ip_isp = _get_ip_and_isp()
     if ip_isp:
         print("IP: {}, провайдер: {}".format(ip_isp[0], ip_isp[1]))
