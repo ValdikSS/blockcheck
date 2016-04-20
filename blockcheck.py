@@ -508,7 +508,7 @@ def main():
     https = test_https_cert()
     print()
     dpi = '-'
-    if http in (1, 2):
+    if http > 0:
         dpi = test_dpi()
         print()
     print("[!] Результат:")
