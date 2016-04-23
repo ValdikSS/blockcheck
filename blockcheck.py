@@ -9,12 +9,13 @@ import ssl
 import sys
 import dns.resolver
 import dns.exception
+import re
 
 # Configuration
 dns_records_list = {"gelbooru.com": ['5.178.68.100'],
-                    "e621.net": ['162.159.243.197', '162.159.244.197'],
-                    "sukebei.nyaa.se": ['69.165.95.242'],
-                    "2chru.net": ['162.159.251.219', '198.41.249.219']}
+                    "e621.net": ['104.25.118.23', '104.25.119.23'],
+                    "sukebei.nyaa.se": ['104.20.74.106', '104.20.75.106'],
+                    "2chru.net": ['212.47.251.61']}
 
 http_list = {'http://gelbooru.com/':
                  {'status': 200, 'lookfor': 'Hentai and Anime Imageboard', 'ip': '5.178.68.100'},
@@ -82,12 +83,19 @@ except ImportError:
     class ThreadSafeConsole():
         pass
 
+trans_table = str.maketrans("⚠✗✓«»", '!XV""')
+
 def print(*args, **kwargs):
     if tkusable:
         for arg in args:
             text.write(str(arg))
         text.write("\n")
     else:
+        if args:
+            if sys.stdout.encoding == "cp866":
+                args = (re.sub('[^\x00-\x7F\u0000-\u007F\u00A0\u00A4\u00B0\u00B7\u0401\u0404\u0407\u040E\u0410-\u044F\u0451\u0454\u0457\u045E\u2116\u2219\u221A\u2500\u2502\u250C\u2510\u2514\u2518\u251C\u2524\u252C\u2534\u253C\u2550-\u256C\u2580\u2584\u2588\u258C\u2590-\u2593\u25A0]+', '', args[0].translate(trans_table).replace("[☠] ", "[FAIL] ").replace("[☺] ", "[:)] ")),) + args[1:]
+            if sys.stdout.encoding == "koi8-r":
+                args = (re.sub('[^\x00-\x7F\u0000-\u007F\u00A0\u00A9\u00B0\u00B2\u00B7\u00F7\u0401\u0410-\u044F\u0451\u2219\u221A\u2248\u2264\u2265\u2320\u2321\u2500\u2502\u250C\u2510\u2514\u2518\u251C\u2524\u252C\u2534\u253C\u2550-\u256C\u2580\u2584\u2588\u258C\u2590-\u2593\u25A0]+', '', args[0].translate(trans_table).replace("[☠] ", "[FAIL] ").replace("[☺] ", "[:)] ")),) + args[1:]
         __builtins__.print(*args, **kwargs)
 
 def _get_a_record(site, dnsserver=None):
@@ -598,7 +606,7 @@ if __name__ == "__main__":
         root = tk.Tk()
         root.title("BlockCheck")
         text = ThreadSafeConsole(root)
-        text.pack()
+        text.pack(expand=1, fill='both')
         threading.Thread(target=main).start()
         root.mainloop()
     else:
