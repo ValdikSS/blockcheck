@@ -598,7 +598,7 @@ if __name__ == "__main__":
         root = tk.Tk()
         root.title("BlockCheck")
         text = ThreadSafeConsole(root)
-        text.pack()
+        text.pack(expand=1, fill='both')
         threading.Thread(target=main).start()
         root.mainloop()
     else:
