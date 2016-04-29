@@ -82,12 +82,18 @@ except ImportError:
     class ThreadSafeConsole():
         pass
 
+trans_table = str.maketrans("⚠✗✓«»", '!XV""')
+
 def print(*args, **kwargs):
     if tkusable:
         for arg in args:
             text.write(str(arg))
         text.write("\n")
     else:
+        if args and sys.stdout.encoding != 'UTF-8':
+            args = [x.translate(trans_table).replace("[☠]", "[FAIL]").replace("[☺]", "[:)]"). \
+                    encode(sys.stdout.encoding, 'replace').decode(sys.stdout.encoding) for x in args
+                   ]
         __builtins__.print(*args, **kwargs)
 
 def _get_a_record(site, dnsserver=None):
