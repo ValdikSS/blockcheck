@@ -12,9 +12,9 @@ import dns.exception
 
 # Configuration
 dns_records_list = {"gelbooru.com": ['5.178.68.100'],
-                    "e621.net": ['162.159.243.197', '162.159.244.197'],
-                    "sukebei.nyaa.se": ['69.165.95.242'],
-                    "2chru.net": ['162.159.251.219', '198.41.249.219']}
+                    "e621.net": ['104.25.118.23', '104.25.119.23'],
+                    "sukebei.nyaa.se": ['104.20.74.106', '104.20.75.106'],
+                    "2chru.net": ['212.47.251.61']}
 
 http_list = {'http://gelbooru.com/':
                  {'status': 200, 'lookfor': 'Hentai and Anime Imageboard', 'ip': '5.178.68.100'},
