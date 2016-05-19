@@ -17,9 +17,9 @@ dns_records_list = {"gelbooru.com": ['5.178.68.100'],
                     "2chru.net": ['212.47.251.61']}
 
 http_list = {'http://gelbooru.com/':
-                 {'status': 200, 'lookfor': 'Hentai and Anime Imageboard', 'ip': '5.178.68.100'},
+                 {'status': 200, 'lookfor': 'Gelbooru is one of the largest', 'ip': '5.178.68.100'},
              'http://gelbooru.com/index.php?page=post&s=view&id=1989610':
-                 {'status': 200, 'lookfor': 'Gelbooru- Image View', 'ip': '5.178.68.100'},
+                 {'status': 200, 'lookfor': 'Gelbooru is one of the largest', 'ip': '5.178.68.100'},
              'http://rule34.xxx/':
                  {'status': 200, 'lookfor': 'Rule 34', 'ip': '178.21.23.224'},
              'http://rule34.xxx/index.php?page=post&s=view&id=879177':
@@ -35,7 +35,7 @@ dpi_list =   {'rutracker.org':
                  'lookfor': 'groupcp.php"', 'ip': '195.82.146.214'},
               'gelbooru.com':
                 {'host': 'gelbooru.com', 'urn': '/index.php?page=post&s=view&id=1989610',
-                 'lookfor': 'Gelbooru- Image View', 'ip': '5.178.68.100'},
+                 'lookfor': 'Gelbooru is one of the largest', 'ip': '5.178.68.100'},
              }
 
 proxy_addr = 'proxy.antizapret.prostovpn.org:3128'
