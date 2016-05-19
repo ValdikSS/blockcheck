@@ -11,6 +11,8 @@ import dns.resolver
 import dns.exception
 
 # Configuration
+VERSION="0.0.8.2"
+
 dns_records_list = {"gelbooru.com": ['5.178.68.100'],
                     "e621.net": ['104.25.118.23', '104.25.119.23'],
                     "sukebei.nyaa.se": ['104.20.74.106', '104.20.75.106'],
@@ -502,7 +504,7 @@ def test_dpi():
     return list(set(dpiresults))
 
 def main():
-    print("BlockCheck v0.0.8")
+    print("BlockCheck v{}".format(VERSION))
     ip_isp = _get_ip_and_isp()
     if ip_isp:
         print("IP: {}, провайдер: {}".format(ip_isp[0], ip_isp[1]))
