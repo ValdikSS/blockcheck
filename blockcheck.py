@@ -28,6 +28,8 @@ http_list = {'http://gelbooru.com/':
                  {'status': 200, 'lookfor': 'Rule 34', 'ip': '178.21.23.224'},
              'http://rutracker.org/forum/index.php':
                  {'status': 200, 'lookfor': 'groupcp.php"', 'ip': '195.82.146.214'},
+             'http://a.putinhuylo.com/':
+                 {'status': 200, 'lookfor': 'Antizapret', 'ip': '107.150.11.193', 'subdomain': True},
             }
 
 https_list = {'https://2chru.cafe/', 'https://e621.net/'}
@@ -373,10 +375,11 @@ HTTP_ISUP_BROKEN = 3
 
 def test_http_access(by_ip=False):
     """
-    Test plain HTTP access and return two values:
+    Test plain HTTP access and return three values:
 
     1. The result - one of the HTTP_ACCESS_* constants
     2. isup.me info - one of the HTTP_ISUP_* constants
+    3. Subdomain block result
     """
     sites = http_list
     proxy = proxy_addr
@@ -388,6 +391,7 @@ def test_http_access(by_ip=False):
     down = 0
     blocks = 0
     blocks_ambiguous = 0
+    blocks_subdomains = 0
 
     for site in sites:
         print("\tОткрываем ", site)
@@ -415,6 +419,8 @@ def test_http_access(by_ip=False):
                 if isup is None:
                     blocks_ambiguous += 1
                 elif isup:
+                    if sites[site].get('subdomain'):
+                        blocks_subdomains += 1
                     blocks += 1
                 else:
                     down += 1
@@ -441,7 +447,7 @@ def test_http_access(by_ip=False):
     else:
         isup = HTTP_ISUP_ALLUP
 
-    return result, isup
+    return result, isup, (blocks_subdomains > 0)
 
 def test_https_cert():
     sites = https_list
@@ -511,7 +517,7 @@ def main():
         print()
     dns = test_dns()
     print()
-    http, http_isup = test_http_access((dns != 0))
+    http, http_isup, subdomain_blocked = test_http_access((dns != 0))
     print()
     https = test_https_cert()
     print()
@@ -543,6 +549,9 @@ def main():
         print("[⚠] Ваш провайдер полностью блокирует доступ к HTTPS-сайтам из реестра.")
     elif https == 3:
         print("[⚠] Доступ по HTTPS проверить не удалось, повторите тест позже.")
+
+    if subdomain_blocked:
+        print("[⚠] Ваш провайдер блокирует поддомены у заблокированного домена.")
 
     if http_isup == HTTP_ISUP_BROKEN:
         print("[⚠] {0} даёт неожиданные ответы или недоступен. Рекомендуем " \
