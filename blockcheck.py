@@ -48,6 +48,7 @@ antizapret_dns = '195.123.209.38'
 isup_server = 'isup.me'
 isup_fmt = 'http://isup.me/{}'
 disable_isup = False #If true, presume that all sites are available
+disable_report = False
 
 # End configuration
 
@@ -594,14 +595,16 @@ def main():
             and https == 0:
         print_http_result("[☺]", "Ваш провайдер не блокирует сайты.")
 
-    _get_url('http://blockcheck.antizapret.prostovpn.org/index.php?dns=' + str(dns) + '&http=' + str(http) +
+    if not disable_report:
+        _get_url('http://blockcheck.antizapret.prostovpn.org/index.php?dns=' + str(dns) + '&http=' + str(http) +
              '&https=' + str(https) + '&dpi=' + urllib.parse.quote(','.join(dpi)))
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Определитель типа блокировки сайтов у провайдера.')
     parser.add_argument('--console', action='store_true', help='Консольный режим. Отключает Tkinter GUI.')
+    parser.add_argument('--no-report', action='store_true', help='Не отправлять результат на сервер.')
     parser.add_argument('--no-isup', action='store_true',
-                            help='Не проверять доступность сайтов через {}' \
+                            help='Не проверять доступность сайтов через {}.' \
                                     .format(isup_server))
     args = parser.parse_args()
 
@@ -610,6 +613,9 @@ if __name__ == "__main__":
 
     if args.no_isup:
         disable_isup = True
+
+    if args.no_report:
+        disable_report = True
 
     if tkusable:
         root = tk.Tk()
