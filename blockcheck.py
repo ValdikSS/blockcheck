@@ -32,7 +32,7 @@ http_list = {'http://gelbooru.com/':
                  {'status': 200, 'lookfor': 'Antizapret', 'ip': '107.150.11.193', 'subdomain': True},
             }
 
-https_list = {'https://2chru.cafe/', 'https://e621.net/'}
+https_list = {'https://uberbooru.com/', 'https://lolibooru.moe/', 'https://e621.net/'}
 
 dpi_list =   {'rutracker.org':
                 {'host': 'rutracker.org', 'urn': '/forum/index.php',
