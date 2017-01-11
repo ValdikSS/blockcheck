@@ -52,6 +52,7 @@ isup_server = 'isup.me'
 isup_fmt = 'http://isup.me/{}'
 disable_isup = False #If true, presume that all sites are available
 disable_report = False
+force_dpi_check = False
 
 # End configuration
 
@@ -534,7 +535,7 @@ def main():
     https = test_https_cert()
     print()
     dpi = '-'
-    if http > 0:
+    if http > 0 or force_dpi_check:
         dpi = test_dpi()
         print()
     print("[!] Результат:")
@@ -617,6 +618,7 @@ if __name__ == "__main__":
     parser.add_argument('--no-isup', action='store_true',
                             help='Не проверять доступность сайтов через {}.' \
                                     .format(isup_server))
+    parser.add_argument('--force-dpi-check', action='store_true', help='Выполнить проверку DPI, даже если провайдер не блокирует сайты.')
     args = parser.parse_args()
 
     if args.console:
@@ -627,6 +629,9 @@ if __name__ == "__main__":
 
     if args.no_report:
         disable_report = True
+
+    if args.force_dpi_check:
+        force_dpi_check = True
 
     if tkusable:
         root = tk.Tk()
