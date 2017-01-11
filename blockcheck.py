@@ -239,6 +239,16 @@ def _dpi_build_tests(host, urn, ip, lookfor):
                         "Host: {}\r\nConnection: close\r\n\r\n".format(host),
                 'lookfor': lookfor, 'ip': ip,
                 'fragment_size': 0, 'fragment_count': 0},
+            'перенос строки перед GET':
+                {'data': "\nGET {} HTTP/1.0\r\n".format(urn) + \
+                        "Host: {}\r\nConnection: close\r\n\r\n".format(host),
+                'lookfor': lookfor, 'ip': ip,
+                'fragment_size': 0, 'fragment_count': 0},
+            'табуляция в конце домена':
+                {'data': "GET {} HTTP/1.0\r\n".format(urn) + \
+                        "Host: {}\t\r\nConnection: close\r\n\r\n".format(host),
+                'lookfor': lookfor, 'ip': ip,
+                'fragment_size': 0, 'fragment_count': 0},
             'фрагментирование заголовка':
                 {'data': "GET {} HTTP/1.0\r\n".format(urn) + \
                         "Host: {}\r\nConnection: close\r\n\r\n".format(host),
