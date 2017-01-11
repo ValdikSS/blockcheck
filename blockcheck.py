@@ -421,7 +421,8 @@ def test_http_access(by_ip=False):
         result = _get_url(site, ip=sites[site].get('ip') if by_ip else None)
         if result[0] == sites[site]['status'] and result[1].find(sites[site]['lookfor']) != -1:
             print("[✓] Сайт открывается")
-            successes += 1
+            if sites[site].get('is_blacklisted', True):
+                successes += 1
         else:
             if result[0]  == sites[site]['status']:
                 print("[☠] Получен неожиданный ответ, скорее всего, "
@@ -431,7 +432,8 @@ def test_http_access(by_ip=False):
             result_proxy = _get_url(site, proxy)
             if result_proxy[0] == sites[site]['status'] and result_proxy[1].find(sites[site]['lookfor']) != -1:
                 print("[✓] Сайт открывается через прокси")
-                successes_proxy += 1
+                if sites[site].get('is_blacklisted', True):
+                    successes_proxy += 1
             else:
                 if result_proxy[0] == sites[site]['status']:
                     print("[☠] Получен неожиданный ответ, скорее всего, "
@@ -440,15 +442,18 @@ def test_http_access(by_ip=False):
                     print("[☠] Сайт не открывается через прокси")
                 isup = check_isup(site)
                 if isup is None:
-                    blocks_ambiguous += 1
+                    if sites[site].get('is_blacklisted', True):
+                        blocks_ambiguous += 1
                 elif isup:
                     if sites[site].get('subdomain'):
                         blocks_subdomains += 1
-                    blocks += 1
+                    if sites[site].get('is_blacklisted', True):
+                        blocks += 1
                 else:
-                    down += 1
+                    if sites[site].get('is_blacklisted', True):
+                        down += 1
 
-    all_sites = len(sites)
+    all_sites = [http_list[i].get('is_blacklisted', True) for i in http_list].count(True)
 
     #Result without isup.me
     if successes == all_sites:
