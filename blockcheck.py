@@ -29,8 +29,10 @@ http_list = {'http://gelbooru.com/':
                  {'status': 200, 'lookfor': 'Rule 34', 'ip': '178.21.23.224'},
              'http://rutracker.org/forum/index.php':
                  {'status': 200, 'lookfor': 'groupcp.php"', 'ip': '195.82.146.214'},
-             'http://a.putinhuylo.com/':
-                 {'status': 200, 'lookfor': 'Antizapret', 'ip': '107.150.11.193', 'subdomain': True},
+             # a.putinhuylo.com is temporary out of our control
+             #'http://a.putinhuylo.com/':
+             #    {'status': 200, 'lookfor': 'Antizapret', 'ip': '107.150.11.193', 'subdomain': True,
+             #     'is_blacklisted': False},
             }
 
 https_list = {'https://uberbooru.com/', 'https://lolibooru.moe/', 'https://e621.net/'}
