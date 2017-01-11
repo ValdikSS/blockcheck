@@ -12,7 +12,7 @@ import dns.resolver
 import dns.exception
 
 # Configuration
-VERSION="0.0.8.4"
+VERSION="0.0.8.5"
 
 dns_records_list = {"gelbooru.com": ['5.178.68.100'],
                     "e621.net": ['104.25.118.23', '104.25.119.23'],
