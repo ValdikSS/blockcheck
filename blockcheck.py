@@ -12,7 +12,7 @@ import dns.resolver
 import dns.exception
 
 # Configuration
-VERSION="0.0.8.5"
+VERSION="0.0.8.6"
 DNSVER="1"
 
 dns_records_list = {"gelbooru.com": ['5.178.68.100'],
