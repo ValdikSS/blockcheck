@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # coding: utf-8
 import argparse
+import json
 import urllib.request
 import urllib.parse
 import urllib.error
@@ -51,6 +52,7 @@ google_dns = '8.8.4.4'
 google_dns_v6 = '2001:4860:4860::8844'
 antizapret_dns = '195.123.209.38'
 antizapret_dns_v6 = '2a02:27ac::10'
+google_dns_api = 'https://dns.google.com/resolve'
 isup_server = 'isup.me'
 isup_fmt = 'http://isup.me/{}'
 disable_isup = False #If true, presume that all sites are available
@@ -133,11 +135,30 @@ def _get_a_record(site, querytype='A', dnsserver=None):
     # If all the requests failed
     return ""
 
-def _get_a_records(sitelist, querytype='A', dnsserver=None):
+def _get_a_record_over_google_api(site, querytype='A'):
+    result = []
+
+    response = _get_url(google_dns_api + "?name={}&type={}".format(site, querytype))
+    if (response[0] != 200):
+        return False
+    response_js = json.loads(response[1])
+    try:
+        for dnsanswer in response_js['Answer']:
+            result.append(dnsanswer['data'])
+    except KeyError:
+        pass
+    return result
+
+def _get_a_records(sitelist, querytype='A', dnsserver=None, googleapi=False):
     result = []
     for site in sitelist:
         try:
-            for item in _get_a_record(site, querytype, dnsserver):
+            if googleapi:
+                responses = _get_a_record_over_google_api(site, querytype)
+            else:
+                responses = _get_a_record(site, querytype, dnsserver)
+
+            for item in responses:
                 result.append(item)
         except dns.resolver.NXDOMAIN:
             print("[!] Невозможно получить DNS-запись для домена {} (NXDOMAIN). Результаты могут быть неточными.".format(site))
