@@ -97,6 +97,10 @@ def print(*args, **kwargs):
     if tkusable:
         for arg in args:
             text.write(str(arg))
+        for key, value in kwargs.items():
+            if key == 'end':
+                text.write(value)
+                return
         text.write("\n")
     else:
         if args and sys.stdout.encoding != 'UTF-8':
