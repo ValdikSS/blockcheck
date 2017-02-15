@@ -25,9 +25,9 @@ http_list = {'http://gelbooru.com/':
              'http://gelbooru.com/index.php?page=post&s=view&id=1989610':
                  {'status': 200, 'lookfor': 'Gelbooru is one of the largest', 'ip': '5.178.68.100'},
              'http://rule34.xxx/':
-                 {'status': 200, 'lookfor': 'Rule 34', 'ip': '178.21.23.224'},
+                 {'status': 200, 'lookfor': 'Rule 34', 'ip': '178.21.23.134'},
              'http://rule34.xxx/index.php?page=post&s=view&id=879177':
-                 {'status': 200, 'lookfor': 'Rule 34', 'ip': '178.21.23.224'},
+                 {'status': 200, 'lookfor': 'Rule 34', 'ip': '178.21.23.134'},
              'http://rutracker.org/forum/index.php':
                  {'status': 200, 'lookfor': 'groupcp.php"', 'ip': '195.82.146.214'},
              # a.putinhuylo.com is temporary out of our control
