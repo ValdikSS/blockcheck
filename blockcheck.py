@@ -14,10 +14,13 @@ import dns.exception
 
 # Configuration
 VERSION="0.0.8.6"
-dns_records_list = {"gelbooru.com": ['5.178.68.100'],
-                    "e621.net": ['104.25.118.23', '104.25.119.23'],
-                    "sukebei.nyaa.se": ['104.20.74.106', '104.20.75.106'],
-                    "2chru.net": ['212.47.251.61']}
+
+dns_records_list = (
+    "sukebei.nyaa.se", #First server in this list should have both A and AAAA records
+    "gelbooru.com",
+    "e621.net",
+    "2chru.net",
+)
 
 http_list = {
     'http://gelbooru.com/':
@@ -50,8 +53,8 @@ dpi_list =   {
 proxy_addr = 'proxy.antizapret.prostovpn.org:3128'
 google_dns = '8.8.4.4'
 google_dns_v6 = '2001:4860:4860::8844'
-antizapret_dns = '195.123.209.38'
-antizapret_dns_v6 = '2a02:27ac::10'
+fake_dns = '3.3.3.3' #Fake server which should never reply
+fake_dns_v6 = '2600::10:20'
 google_dns_api = 'https://dns.google.com/resolve'
 isup_server = 'isup.me'
 isup_fmt = 'http://isup.me/{}'
@@ -347,46 +350,37 @@ DNS_IPV4 = 0
 DNS_IPV6 = 1
 
 def test_dns(dnstype=DNS_IPV4):
-    sites = dns_records_list
-    sites_list = list(sites.keys())
+    sites_list = list(dns_records_list)
     query_type = ("A" if dnstype==DNS_IPV4 else "AAAA")
     
     print("[O] Тестируем " + ("IPv4" if dnstype==DNS_IPV4 else "IPv6") + " DNS")
-    print("[O] Получаем эталонные DNS с сервера")
-    try:
-        remote_dns = urllib.request.urlopen("http://blockcheck.antizapret.prostovpn.org/getdns.php?v=" \
-            + DNSVER + "&v6=" + str(dnstype), timeout=10).read()
-        remote_dns = _decode_bytes(remote_dns).split()
-        print("\tЭталонные адреса:\t\t", str(remote_dns))
-    except:
-        remote_dns = None
-        print("[☠] Не удалось получить DNS с сервера, результаты могут быть неточными")
 
     resolved_default_dns = _get_a_records(sites_list, query_type)
-    print("\tАдреса через системный DNS:\t", str(resolved_default_dns))
+    print("\tЧерез системный DNS:\t", str(resolved_default_dns))
     resolved_google_dns = _get_a_records(sites_list, query_type, (google_dns if dnstype==DNS_IPV4 else google_dns_v6))
     if resolved_google_dns:
-        print("\tАдреса через Google DNS:\t", str(resolved_google_dns))
+        print("\tЧерез Google DNS:\t", str(resolved_google_dns))
     else:
         print("\tНе удалось подключиться к Google DNS")
-    resolved_az_dns = _get_a_records(sites_list, query_type, (antizapret_dns if dnstype==DNS_IPV4 else antizapret_dns_v6))
-    if resolved_az_dns:
-        print("\tАдреса через DNS AntiZapret:\t", str(resolved_az_dns))
+    resolved_google_api = _get_a_records(sites_list, query_type, googleapi=True)
+    if resolved_google_api:
+        print("\tЧерез Google API:\t", str(resolved_google_api))
     else:
-        print("\tНе удалось подключиться к DNS AntiZapret")
+        print("\tНе удалось подключиться к Google API")
+    resolved_fake_dns = _get_a_records((sites_list[0],), query_type, (fake_dns if dnstype==DNS_IPV4 else fake_dns_v6))
+    if resolved_fake_dns:
+        print("\tЧерез недоступный DNS:\t", str(resolved_fake_dns))
+    else:
+        print("\tНесуществующий DNS не вернул адресов (это не ошибка)")
 
     if not resolved_google_dns or not resolved_default_dns:
         return 4
 
-    if (remote_dns):
-        # Если получили IP с сервера, используем их
-        dns_records = remote_dns
-    else:
-        dns_records = sorted([item for sublist in sites.values() for item in sublist])
+    # Assume that Google API always works and returns correct addresses
+    dns_records = resolved_google_api
 
     if resolved_default_dns == resolved_google_dns:
-        if set(resolved_az_dns) == \
-        ({antizapret_dns} if dnstype==DNS_IPV4 else {antizapret_dns_v6}):
+        if not resolved_fake_dns:
             print("[✓] DNS-записи не подменяются")
             print("[✓] DNS не перенаправляется")
             return 0
