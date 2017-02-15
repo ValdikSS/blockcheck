@@ -14,38 +14,38 @@ import dns.exception
 
 # Configuration
 VERSION="0.0.8.6"
-DNSVER="1"
-
 dns_records_list = {"gelbooru.com": ['5.178.68.100'],
                     "e621.net": ['104.25.118.23', '104.25.119.23'],
                     "sukebei.nyaa.se": ['104.20.74.106', '104.20.75.106'],
                     "2chru.net": ['212.47.251.61']}
 
-http_list = {'http://gelbooru.com/':
-                 {'status': 200, 'lookfor': 'Gelbooru is one of the largest', 'ip': '5.178.68.100'},
-             'http://gelbooru.com/index.php?page=post&s=view&id=1989610':
-                 {'status': 200, 'lookfor': 'Gelbooru is one of the largest', 'ip': '5.178.68.100'},
-             'http://rule34.xxx/':
-                 {'status': 200, 'lookfor': 'Rule 34', 'ip': '178.21.23.134'},
-             'http://rule34.xxx/index.php?page=post&s=view&id=879177':
-                 {'status': 200, 'lookfor': 'Rule 34', 'ip': '178.21.23.134'},
-             'http://rutracker.org/forum/index.php':
-                 {'status': 200, 'lookfor': 'groupcp.php"', 'ip': '195.82.146.214'},
-             # a.putinhuylo.com is temporary out of our control
-             #'http://a.putinhuylo.com/':
-             #    {'status': 200, 'lookfor': 'Antizapret', 'ip': '107.150.11.193', 'subdomain': True,
-             #     'is_blacklisted': False},
-            }
+http_list = {
+    'http://gelbooru.com/':
+        {'status': 200, 'lookfor': 'Gelbooru is one of the largest', 'ip': '5.178.68.100'},
+    'http://gelbooru.com/index.php?page=post&s=view&id=1989610':
+        {'status': 200, 'lookfor': 'Gelbooru is one of the largest', 'ip': '5.178.68.100'},
+    'http://rule34.xxx/':
+        {'status': 200, 'lookfor': 'Rule 34', 'ip': '178.21.23.134'},
+    'http://rule34.xxx/index.php?page=post&s=view&id=879177':
+        {'status': 200, 'lookfor': 'Rule 34', 'ip': '178.21.23.134'},
+    'http://rutracker.org/forum/index.php':
+        {'status': 200, 'lookfor': 'groupcp.php"', 'ip': '195.82.146.214'},
+    # a.putinhuylo.com is temporary out of our control
+    #'http://a.putinhuylo.com/':
+    #    {'status': 200, 'lookfor': 'Antizapret', 'ip': '107.150.11.193', 'subdomain': True,
+    #     'is_blacklisted': False},
+}
 
 https_list = {'https://uberbooru.com/', 'https://lolibooru.moe/', 'https://e621.net/'}
 
-dpi_list =   {'rutracker.org':
-                {'host': 'rutracker.org', 'urn': '/forum/index.php',
-                 'lookfor': 'groupcp.php"', 'ip': '195.82.146.214'},
-              'gelbooru.com':
-                {'host': 'gelbooru.com', 'urn': '/index.php?page=post&s=view&id=1989610',
-                 'lookfor': 'Gelbooru is one of the largest', 'ip': '5.178.68.100'},
-             }
+dpi_list =   {
+    'rutracker.org':
+    {'host': 'rutracker.org', 'urn': '/forum/index.php',
+        'lookfor': 'groupcp.php"', 'ip': '195.82.146.214'},
+    'gelbooru.com':
+    {'host': 'gelbooru.com', 'urn': '/index.php?page=post&s=view&id=1989610',
+        'lookfor': 'Gelbooru is one of the largest', 'ip': '5.178.68.100'},
+}
 
 proxy_addr = 'proxy.antizapret.prostovpn.org:3128'
 google_dns = '8.8.4.4'
