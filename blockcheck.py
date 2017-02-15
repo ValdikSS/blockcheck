@@ -435,6 +435,13 @@ def test_http_access(by_ip=False):
 
     for site in sites:
         print("\tОткрываем ", site)
+        # Сначала пытаемся получить IP-адрес через Google API.
+        # Если не получилось, используем статический.
+        domain = list(urllib.parse.urlsplit(site))[1]
+        newip = _get_a_record_over_google_api(domain)
+        if newip:
+            sites[site]['ip'] = newip[0]
+
         result = _get_url(site, ip=sites[site].get('ip') if by_ip else None)
         if result[0] == sites[site]['status'] and result[1].find(sites[site]['lookfor']) != -1:
             print("[✓] Сайт открывается")
