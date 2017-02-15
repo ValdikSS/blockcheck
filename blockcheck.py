@@ -48,7 +48,9 @@ dpi_list =   {'rutracker.org':
 
 proxy_addr = 'proxy.antizapret.prostovpn.org:3128'
 google_dns = '8.8.4.4'
+google_dns_v6 = '2001:4860:4860::8844'
 antizapret_dns = '195.123.209.38'
+antizapret_dns_v6 = '2a02:27ac::10'
 antizapret_dns_fake_aaaa_reply = 'fe80::'
 isup_server = 'isup.me'
 isup_fmt = 'http://isup.me/{}'
@@ -342,12 +344,12 @@ def test_dns(dnstype=DNS_IPV4):
 
     resolved_default_dns = _get_a_records(sites_list, query_type)
     print("\tАдреса через системный DNS:\t", str(resolved_default_dns))
-    resolved_google_dns = _get_a_records(sites_list, query_type, google_dns)
+    resolved_google_dns = _get_a_records(sites_list, query_type, (google_dns if dnstype==DNS_IPV4 else google_dns_v6))
     if resolved_google_dns:
         print("\tАдреса через Google DNS:\t", str(resolved_google_dns))
     else:
         print("\tНе удалось подключиться к Google DNS")
-    resolved_az_dns = _get_a_records(sites_list, query_type, antizapret_dns)
+    resolved_az_dns = _get_a_records(sites_list, query_type, (antizapret_dns if dnstype==DNS_IPV4 else antizapret_dns_v6))
     if resolved_az_dns:
         print("\tАдреса через DNS AntiZapret:\t", str(resolved_az_dns))
     else:
