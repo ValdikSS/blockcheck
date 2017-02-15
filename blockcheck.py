@@ -28,11 +28,11 @@ http_list = {
     'http://gelbooru.com/index.php?page=post&s=view&id=1989610':
         {'status': 200, 'lookfor': 'Gelbooru is one of the largest', 'ip': '5.178.68.100'},
     'http://rule34.xxx/':
-        {'status': 200, 'lookfor': 'Rule 34', 'ip': '178.21.23.134', 'ipv6': '2a00:1ca8:2a::26d'},
+        {'status': 200, 'lookfor': 'Rule 34', 'ip': '178.21.23.134', 'ipv6': '[2a00:1ca8:2a::26d]'},
     'http://rule34.xxx/index.php?page=post&s=view&id=879177':
-        {'status': 200, 'lookfor': 'Rule 34', 'ip': '178.21.23.134', 'ipv6': '2a00:1ca8:2a::26d'},
+        {'status': 200, 'lookfor': 'Rule 34', 'ip': '178.21.23.134', 'ipv6': '[2a00:1ca8:2a::26d]'},
     'http://rutracker.org/forum/index.php':
-        {'status': 200, 'lookfor': 'groupcp.php"', 'ip': '195.82.146.214', 'ipv6': '2a02:4680:22::214'},
+        {'status': 200, 'lookfor': 'groupcp.php"', 'ip': '195.82.146.214', 'ipv6': '[2a02:4680:22::214]'},
     # a.putinhuylo.com is temporary out of our control
     #'http://a.putinhuylo.com/':
     #    {'status': 200, 'lookfor': 'Antizapret', 'ip': '107.150.11.193', 'subdomain': True,
@@ -44,7 +44,7 @@ https_list = {'https://rutracker.org/forum/index.php', 'https://lolibooru.moe/',
 dpi_list =   {
     'rutracker.org':
     {'host': 'rutracker.org', 'urn': '/forum/index.php',
-        'lookfor': 'groupcp.php"', 'ip': '195.82.146.214', 'ipv6': '2a02:4680:22::214'},
+        'lookfor': 'groupcp.php"', 'ip': '195.82.146.214', 'ipv6': '[2a02:4680:22::214]'},
     'gelbooru.com':
     {'host': 'gelbooru.com', 'urn': '/index.php?page=post&s=view&id=1989610',
         'lookfor': 'Gelbooru is one of the largest', 'ip': '5.178.68.100'},
@@ -429,15 +429,12 @@ def test_http_access(by_ip=False):
     print("[O] Тестируем HTTP")
 
     successes = 0
-    successes_v6 = 0
+    successes_partial = 0
     successes_proxy = 0
     down = 0
     blocks = 0
-    blocks_v6 = 0
     blocks_ambiguous = 0
-    blocks_ambiguous_v6 = 0
     blocks_subdomains = 0
-    blocks_subdomains_v6 = 0
 
     for site in sites:
         print("\tОткрываем ", site)
@@ -450,7 +447,7 @@ def test_http_access(by_ip=False):
             if newip:
                 sites[site]['ip'] = newip[0]
             if newipv6:
-                sites[site]['ipv6'] = newipv6[0]
+                sites[site]['ipv6'] = '[' + newipv6[0] + ']'
 
         if ipv6_available:
             result = _get_url(site, ip=sites[site].get('ip'))
@@ -469,16 +466,13 @@ def test_http_access(by_ip=False):
 
             if sites[site].get('is_blacklisted', True):
                 successes += 1
-                successes_v6 += 1
         elif ipv6_available and (result_ok or result_v6_ok):
             if not result_ok and result_v6_ok:
                 print("[!] Сайт открывается только по IPv6")
-                if sites[site].get('is_blacklisted', True):
-                    successes_v6 += 1
-            elif result_ok and not result_v6_ok:
+                successes_partial += 1
+            else:
                 print("[!] Сайт открывается только по IPv4")
-                if sites[site].get('is_blacklisted', True):
-                    successes += 1
+                successes_partial += 1
         else:
             if (result[0] == sites[site]['status'] or (ipv6_available and result_v6[0] == sites[site]['status'])):
                 print("[☠] Получен неожиданный ответ, скорее всего, "
@@ -514,7 +508,7 @@ def test_http_access(by_ip=False):
     #Result without isup.me
     if successes == all_sites:
         result = HTTP_ACCESS_NOBLOCKS
-    elif successes > 0 and successes + successes_proxy == all_sites:
+    elif successes > 0 and successes + successes_proxy + successes_partial == all_sites:
         result = HTTP_ACCESS_IPDPI
     elif successes > 0:
         result = HTTP_ACCESS_FULLDPI
@@ -605,6 +599,8 @@ def check_ipv6_availability():
     return False
 
 def main():
+    global ipv6_available
+
     print("BlockCheck v{}".format(VERSION))
     ip_isp = _get_ip_and_isp()
     if ip_isp:
