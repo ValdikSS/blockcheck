@@ -51,7 +51,6 @@ google_dns = '8.8.4.4'
 google_dns_v6 = '2001:4860:4860::8844'
 antizapret_dns = '195.123.209.38'
 antizapret_dns_v6 = '2a02:27ac::10'
-antizapret_dns_fake_aaaa_reply = 'fe80::'
 isup_server = 'isup.me'
 isup_fmt = 'http://isup.me/{}'
 disable_isup = False #If true, presume that all sites are available
@@ -366,7 +365,7 @@ def test_dns(dnstype=DNS_IPV4):
 
     if resolved_default_dns == resolved_google_dns:
         if set(resolved_az_dns) == \
-        ({antizapret_dns} if dnstype==DNS_IPV4 else {antizapret_dns_fake_aaaa_reply}):
+        ({antizapret_dns} if dnstype==DNS_IPV4 else {antizapret_dns_v6}):
             print("[✓] DNS-записи не подменяются")
             print("[✓] DNS не перенаправляется")
             return 0
