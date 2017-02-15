@@ -13,6 +13,7 @@ import dns.exception
 
 # Configuration
 VERSION="0.0.8.5"
+DNSVER="1"
 
 dns_records_list = {"gelbooru.com": ['5.178.68.100'],
                     "e621.net": ['104.25.118.23', '104.25.119.23'],
@@ -48,6 +49,7 @@ dpi_list =   {'rutracker.org':
 proxy_addr = 'proxy.antizapret.prostovpn.org:3128'
 google_dns = '8.8.4.4'
 antizapret_dns = '195.123.209.38'
+antizapret_dns_fake_aaaa_reply = 'fe80::'
 isup_server = 'isup.me'
 isup_fmt = 'http://isup.me/{}'
 disable_isup = False #If true, presume that all sites are available
@@ -109,7 +111,7 @@ def print(*args, **kwargs):
                    ]
         __builtins__.print(*args, **kwargs)
 
-def _get_a_record(site, dnsserver=None):
+def _get_a_record(site, querytype='A', dnsserver=None):
     resolver = dns.resolver.Resolver()
     resolver.timeout = 5
     resolver.lifetime = 5
@@ -120,7 +122,7 @@ def _get_a_record(site, dnsserver=None):
     result = []
     while len(resolver.nameservers):
         try:
-            for item in resolver.query(site).rrset.items:
+            for item in resolver.query(site, querytype).rrset.items:
                 result.append(item.to_text())
             return result
 
@@ -130,14 +132,16 @@ def _get_a_record(site, dnsserver=None):
     # If all the requests failed
     return ""
 
-def _get_a_records(sitelist, dnsserver=None):
+def _get_a_records(sitelist, querytype='A', dnsserver=None):
     result = []
     for site in sitelist:
         try:
-            for item in _get_a_record(site, dnsserver):
+            for item in _get_a_record(site, querytype, dnsserver):
                 result.append(item)
         except dns.resolver.NXDOMAIN:
             print("[!] Невозможно получить DNS-запись для домена {} (NXDOMAIN). Результаты могут быть неточными.".format(site))
+        except dns.resolver.NoAnswer:
+            pass
         except dns.exception.DNSException:
             return ""
 
@@ -329,29 +333,33 @@ def check_isup(page_url):
         print("[⁇] Не удалось распознать ответ от {}".format(isup_server))
         return None
 
-def test_dns():
+DNS_IPV4 = 0
+DNS_IPV6 = 1
+
+def test_dns(dnstype=DNS_IPV4):
     sites = dns_records_list
     sites_list = list(sites.keys())
+    query_type = ("A" if dnstype==DNS_IPV4 else "AAAA")
     
-    print("[O] Тестируем DNS")
+    print("[O] Тестируем " + ("IPv4" if dnstype==DNS_IPV4 else "IPv6") + " DNS")
     print("[O] Получаем эталонные DNS с сервера")
     try:
-        remote_dns = urllib.request.urlopen("http://blockcheck.antizapret.prostovpn.org/getdns.php",
-            timeout=10).read()
+        remote_dns = urllib.request.urlopen("http://blockcheck.antizapret.prostovpn.org/getdns.php?v=" \
+            + DNSVER + "&v6=" + str(dnstype), timeout=10).read()
         remote_dns = _decode_bytes(remote_dns).split()
         print("\tЭталонные адреса:\t\t", str(remote_dns))
     except:
         remote_dns = None
         print("[☠] Не удалось получить DNS с сервера, результаты могут быть неточными")
 
-    resolved_default_dns = _get_a_records(sites_list)
+    resolved_default_dns = _get_a_records(sites_list, query_type)
     print("\tАдреса через системный DNS:\t", str(resolved_default_dns))
-    resolved_google_dns = _get_a_records(sites_list, google_dns)
+    resolved_google_dns = _get_a_records(sites_list, query_type, google_dns)
     if resolved_google_dns:
         print("\tАдреса через Google DNS:\t", str(resolved_google_dns))
     else:
         print("\tНе удалось подключиться к Google DNS")
-    resolved_az_dns = _get_a_records(sites_list, antizapret_dns)
+    resolved_az_dns = _get_a_records(sites_list, query_type, antizapret_dns)
     if resolved_az_dns:
         print("\tАдреса через DNS AntiZapret:\t", str(resolved_az_dns))
     else:
@@ -367,7 +375,8 @@ def test_dns():
         dns_records = sorted([item for sublist in sites.values() for item in sublist])
 
     if resolved_default_dns == resolved_google_dns:
-        if set(resolved_az_dns) == {antizapret_dns}:
+        if set(resolved_az_dns) == \
+        ({antizapret_dns} if dnstype==DNS_IPV4 else {antizapret_dns_fake_aaaa_reply}):
             print("[✓] DNS-записи не подменяются")
             print("[✓] DNS не перенаправляется")
             return 0
@@ -541,15 +550,31 @@ def test_dpi():
                     print("[☠] Сайт не открывается")
     return list(set(dpiresults))
 
+def check_ipv6_availability():
+    print("Проверка работоспособности IPv6", end='')
+    google_v6addr = _get_a_record("google.com", "AAAA")
+    if (google_v6addr):
+        google_v6 = _get_url("https://www.google.com/", ip="[" + google_v6addr[0] + "]")
+        if len(google_v6[1]):
+            print(": IPv6 доступен!")
+            return True
+    print(": IPv6 недоступен.")
+    return False
+
 def main():
     print("BlockCheck v{}".format(VERSION))
     ip_isp = _get_ip_and_isp()
     if ip_isp:
         print("IP: {}, провайдер: {}".format(ip_isp[0], ip_isp[1]))
         print()
-    dns = test_dns()
+    ipv6_available = check_ipv6_availability()
+    dnsv4 = test_dns(DNS_IPV4)
+    dnsv6 = 0
+    if ipv6_available:
+        print()
+        dnsv6 = test_dns(DNS_IPV6)
     print()
-    http, http_isup, subdomain_blocked = test_http_access((dns != 0))
+    http, http_isup, subdomain_blocked = test_http_access((dnsv4 != 0) or (dnsv6 != 0))
     print()
     https = test_https_cert()
     print()
