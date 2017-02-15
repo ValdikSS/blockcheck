@@ -28,11 +28,11 @@ http_list = {
     'http://gelbooru.com/index.php?page=post&s=view&id=1989610':
         {'status': 200, 'lookfor': 'Gelbooru is one of the largest', 'ip': '5.178.68.100'},
     'http://rule34.xxx/':
-        {'status': 200, 'lookfor': 'Rule 34', 'ip': '178.21.23.134'},
+        {'status': 200, 'lookfor': 'Rule 34', 'ip': '178.21.23.134', 'ipv6': '2a00:1ca8:2a::26d'},
     'http://rule34.xxx/index.php?page=post&s=view&id=879177':
-        {'status': 200, 'lookfor': 'Rule 34', 'ip': '178.21.23.134'},
+        {'status': 200, 'lookfor': 'Rule 34', 'ip': '178.21.23.134', 'ipv6': '2a00:1ca8:2a::26d'},
     'http://rutracker.org/forum/index.php':
-        {'status': 200, 'lookfor': 'groupcp.php"', 'ip': '195.82.146.214'},
+        {'status': 200, 'lookfor': 'groupcp.php"', 'ip': '195.82.146.214', 'ipv6': '2a02:4680:22::214'},
     # a.putinhuylo.com is temporary out of our control
     #'http://a.putinhuylo.com/':
     #    {'status': 200, 'lookfor': 'Antizapret', 'ip': '107.150.11.193', 'subdomain': True,
@@ -44,7 +44,7 @@ https_list = {'https://rutracker.org/forum/index.php', 'https://lolibooru.moe/',
 dpi_list =   {
     'rutracker.org':
     {'host': 'rutracker.org', 'urn': '/forum/index.php',
-        'lookfor': 'groupcp.php"', 'ip': '195.82.146.214'},
+        'lookfor': 'groupcp.php"', 'ip': '195.82.146.214', 'ipv6': '2a02:4680:22::214'},
     'gelbooru.com':
     {'host': 'gelbooru.com', 'urn': '/index.php?page=post&s=view&id=1989610',
         'lookfor': 'Gelbooru is one of the largest', 'ip': '5.178.68.100'},
@@ -63,6 +63,8 @@ disable_report = False
 force_dpi_check = False
 
 # End configuration
+
+ipv6_available = False
 
 try:
     import tkinter as tk
@@ -427,28 +429,58 @@ def test_http_access(by_ip=False):
     print("[O] Тестируем HTTP")
 
     successes = 0
+    successes_v6 = 0
     successes_proxy = 0
     down = 0
     blocks = 0
+    blocks_v6 = 0
     blocks_ambiguous = 0
+    blocks_ambiguous_v6 = 0
     blocks_subdomains = 0
+    blocks_subdomains_v6 = 0
 
     for site in sites:
         print("\tОткрываем ", site)
         # Сначала пытаемся получить IP-адрес через Google API.
         # Если не получилось, используем статический.
-        domain = list(urllib.parse.urlsplit(site))[1]
-        newip = _get_a_record_over_google_api(domain)
-        if newip:
-            sites[site]['ip'] = newip[0]
+        if by_ip and not ipv6_available:
+            domain = list(urllib.parse.urlsplit(site))[1]
+            newip = _get_a_record_over_google_api(domain)
+            newipv6 = _get_a_record_over_google_api(domain, 'AAAA')
+            if newip:
+                sites[site]['ip'] = newip[0]
+            if newipv6:
+                sites[site]['ipv6'] = newipv6[0]
 
-        result = _get_url(site, ip=sites[site].get('ip') if by_ip else None)
-        if result[0] == sites[site]['status'] and result[1].find(sites[site]['lookfor']) != -1:
+        if ipv6_available:
+            result = _get_url(site, ip=sites[site].get('ip'))
+            result_v6 = _get_url(site, ip=sites[site].get('ipv6'))
+        else:
+            result = _get_url(site, ip=sites[site].get('ip') if by_ip else None)
+
+        result_ok = (result[0] == sites[site]['status'] and result[1].find(sites[site]['lookfor']) != -1)
+        if ipv6_available:
+            result_v6_ok = (result_v6[0] == sites[site]['status'] and result_v6[1].find(sites[site]['lookfor']) != -1)
+        else:
+            result_v6_ok = True #Not really
+
+        if result_ok and result_v6_ok:
             print("[✓] Сайт открывается")
+
             if sites[site].get('is_blacklisted', True):
                 successes += 1
+                successes_v6 += 1
+        elif ipv6_available and (result_ok or result_v6_ok):
+            if not result_ok and result_v6_ok:
+                print("[!] Сайт открывается только по IPv6")
+                if sites[site].get('is_blacklisted', True):
+                    successes_v6 += 1
+            elif result_ok and not result_v6_ok:
+                print("[!] Сайт открывается только по IPv4")
+                if sites[site].get('is_blacklisted', True):
+                    successes += 1
         else:
-            if result[0]  == sites[site]['status']:
+            if (result[0] == sites[site]['status'] or (ipv6_available and result_v6[0] == sites[site]['status'])):
                 print("[☠] Получен неожиданный ответ, скорее всего, "
                       "страница-заглушка провайдера. Пробуем через прокси.")
             else:
