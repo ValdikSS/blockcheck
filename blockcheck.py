@@ -151,6 +151,11 @@ def _decode_bytes(input_bytes):
     return input_bytes.decode(errors='replace')
 
 def _get_url(url, proxy=None, ip=None):
+    context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
+    context.check_hostname = False
+    https_handler = urllib.request.HTTPSHandler(context=context)
+    opener = urllib.request.build_opener(https_handler)
+
     if ip:
         parsed_url = list(urllib.parse.urlsplit(url))
         host = parsed_url[1]
@@ -167,25 +172,8 @@ def _get_url(url, proxy=None, ip=None):
     req.add_header('User-Agent', 'Mozilla/5.0 (X11; Linux x86_64; rv:30.0) Gecko/20100101 Firefox/30.0')
 
     try:
-        try:
-            opened = urllib.request.urlopen(req, timeout=15, cadefault=True)
-            output = opened.read()
-        except TypeError as e:
-            if 'cadefault' in str(e):
-                if sys.version_info.major == 3 and sys.version_info.minor<2:
-                    print("[☠] У вас слишком старая версия Python, которая не поддерживает проверку сертификатов.",
-                          "Установите Python 3.2 или новее.")
-                    sys.exit(1)
-
-                cafile = "/etc/ssl/certs/ca-certificates.crt"
-                if not os.path.isfile(cafile):
-                    cafile = "/etc/ssl/certs/ca-bundle.crt"
-                if not os.path.isfile(cafile):
-                    print("[☠] Хранилище сертификатов не найдено, продолжение проверки невозможно.")
-                    sys.exit(1)
-
-                opened = urllib.request.urlopen(req, timeout=15, cafile=cafile)
-                output = opened.read()
+        opened = opener.open(req, timeout=15)
+        output = opened.read()
     except ssl.CertificateError:
         return (-1, '')
     except (urllib.error.URLError, socket.error, socket.timeout) as e:
