@@ -143,7 +143,7 @@ def _get_a_record_over_google_api(site, querytype='A'):
 
     response = _get_url(google_dns_api + "?name={}&type={}".format(site, querytype))
     if (response[0] != 200):
-        return False
+        return ''
     response_js = json.loads(response[1])
     try:
         for dnsanswer in response_js['Answer']:
@@ -176,15 +176,40 @@ def _decode_bytes(input_bytes):
     return input_bytes.decode(errors='replace')
 
 def _get_url(url, proxy=None, ip=None):
+    parsed_url = list(urllib.parse.urlsplit(url))
+    host = parsed_url[1]
+
+    if parsed_url[0].lower() == "https":
+        # Manually check certificate as we may need to connect by IP later
+        # and handling certificate check in urllib is painful and invasive
+        context_hostname_check = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
+        conn = context_hostname_check.wrap_socket(socket.socket(socket.AF_INET6), server_hostname=host)
+        conn.settimeout(10)
+        try:
+            conn.connect((ip if ip else host, 443))
+        except ssl.CertificateError:
+            return (-1, '')
+        except (socket.timeout, socket.error):
+            return (0, '')
+        finally:
+            try:
+                conn.shutdown(socket.SHUT_RDWR)
+            except:
+                pass
+            try:
+                conn.close()
+            except:
+                pass
+
+    # SSL Context for urllib
     context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
+    # We performed hostname matching manually before
     context.check_hostname = False
     https_handler = urllib.request.HTTPSHandler(context=context)
     opener = urllib.request.build_opener(https_handler)
 
     if ip:
-        parsed_url = list(urllib.parse.urlsplit(url))
-        host = parsed_url[1]
-        parsed_url[1] = str(ip)
+        parsed_url[1] = '[' + str(ip) + ']' if ':' in str(ip) else str(ip)
         newurl = urllib.parse.urlunsplit(parsed_url)
         req = urllib.request.Request(newurl)
         req.add_header('Host', host)
@@ -565,7 +590,7 @@ def check_ipv6_availability():
     print("Проверка работоспособности IPv6", end='')
     google_v6addr = _get_a_record("google.com", "AAAA")
     if (google_v6addr):
-        google_v6 = _get_url("https://www.google.com/", ip="[" + google_v6addr[0] + "]")
+        google_v6 = _get_url("https://www.google.com/", ip=google_v6addr[0])
         if len(google_v6[1]):
             print(": IPv6 доступен!")
             return True
