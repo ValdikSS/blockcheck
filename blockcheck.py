@@ -185,7 +185,9 @@ def _get_url(url, proxy=None, ip=None):
         # Manually check certificate as we may need to connect by IP later
         # and handling certificate check in urllib is painful and invasive
         context_hostname_check = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
-        conn = context_hostname_check.wrap_socket(socket.socket(socket.AF_INET6), server_hostname=host)
+        conn = context_hostname_check.wrap_socket(socket.socket(socket.AF_INET6 if \
+            (':' in ip if ip else False) else socket.AF_INET),
+            server_hostname=host)
         conn.settimeout(10)
         try:
             conn.connect((ip if ip else host, 443))
@@ -453,13 +455,16 @@ def test_http_access(by_ip=False):
 
     print("[O] Тестируем HTTP")
 
-    successes = 0
-    successes_partial = 0
+    successes_v4 = 0
+    successes_v6 = 0
     successes_proxy = 0
     down = 0
     blocks = 0
     blocks_ambiguous = 0
     blocks_subdomains = 0
+
+    result_v4 = -1
+    result_v6 = -1
 
     for site in sites:
         print("\tОткрываем ", site)
@@ -490,15 +495,16 @@ def test_http_access(by_ip=False):
             print("[✓] Сайт открывается")
 
             if sites[site].get('is_blacklisted', True):
-                successes += 1
+                successes_v4 += 1
+                successes_v6 += 1
         elif ipv6_available and (result_ok or result_v6_ok):
             if not result_ok and result_v6_ok:
                 print("[!] Сайт открывается только по IPv6")
-                successes_partial += 1
+                successes_v6 += 1
             else:
                 print("[!] Сайт открывается только по IPv4")
-                successes_partial += 1
-        else:
+                successes_v4 += 1
+        if not (result_ok and result_v6_ok):
             if (result[0] == sites[site]['status'] or (ipv6_available and result_v6[0] == sites[site]['status'])):
                 print("[☠] Получен неожиданный ответ, скорее всего, "
                       "страница-заглушка провайдера. Пробуем через прокси.")
@@ -529,16 +535,28 @@ def test_http_access(by_ip=False):
                         down += 1
 
     all_sites = [http_list[i].get('is_blacklisted', True) for i in http_list].count(True)
+    print('all sites = {}'.format(all_sites))
+    print('success v4 = {}, success v6 = {}'.format(successes_v4, successes_v6))
 
     #Result without isup.me
-    if successes == all_sites:
-        result = HTTP_ACCESS_NOBLOCKS
-    elif successes > 0 and successes + successes_proxy + successes_partial == all_sites:
-        result = HTTP_ACCESS_IPDPI
-    elif successes > 0:
-        result = HTTP_ACCESS_FULLDPI
+    if successes_v4 == all_sites:
+        result_v4 = HTTP_ACCESS_NOBLOCKS
+    elif successes_v4 > 0 and successes_v4 + successes_proxy == all_sites:
+        result_v4 = HTTP_ACCESS_IPDPI
+    elif successes_v4 > 0:
+        result_v4 = HTTP_ACCESS_FULLDPI
     else:
-        result = HTTP_ACCESS_IPBLOCK
+        result_v4 = HTTP_ACCESS_IPBLOCK
+
+    if ipv6_available:
+        if successes_v6 == all_sites:
+            result_v6 = HTTP_ACCESS_NOBLOCKS
+        elif successes_v6 > 0 and successes_v6 + successes_proxy == all_sites:
+            result_v6 = HTTP_ACCESS_IPDPI
+        elif successes_v6 > 0:
+            result_v6 = HTTP_ACCESS_FULLDPI
+        else:
+            result_v6 = HTTP_ACCESS_IPBLOCK
 
     #isup.me info
     if blocks_ambiguous > 0:
@@ -550,7 +568,7 @@ def test_http_access(by_ip=False):
     else:
         isup = HTTP_ISUP_ALLUP
 
-    return result, isup, (blocks_subdomains > 0)
+    return result_v4, result_v6, isup, (blocks_subdomains > 0)
 
 def test_https_cert():
     sites = https_list
@@ -638,12 +656,14 @@ def main():
         print()
         dnsv6 = test_dns(DNS_IPV6)
     print()
-    http, http_isup, subdomain_blocked = test_http_access((dnsv4 != 0) or (dnsv6 != 0))
+    http_v4, http_v6, http_isup, subdomain_blocked = test_http_access((dnsv4 != 0) or (dnsv6 != 0))
     print()
     https = test_https_cert()
     print()
     dpi = '-'
-    if http > 0 or force_dpi_check:
+    if http_v4 > 0 or http_v6 > 0 or force_dpi_check:
+        print(http_v4)
+        print(http_v6)
         dpi = test_dpi()
         print()
     print("[!] Результат:")
@@ -719,19 +739,34 @@ def main():
             print("{} Если проигнорировать {}, то {}" \
                 .format(symbol, isup_server, message[0].lower() + message[1:]))
 
-    if http == HTTP_ACCESS_IPBLOCK:
-        print_http_result("[⚠]", "Ваш провайдер блокирует по IP-адресу. " \
-                                 "Используйте любой способ обхода блокировок.")
-    elif http == HTTP_ACCESS_FULLDPI:
-        print_http_result("[⚠]", "У вашего провайдера \"полный\" DPI. Он " \
-                                 "отслеживает ссылки даже внутри прокси, " \
-                                 "поэтому вам следует использовать любое " \
-                                 "шифрованное соединение, например, " \
-                                 "VPN или Tor.")
-    elif http == HTTP_ACCESS_IPDPI:
-        print_http_result("[⚠]", "У вашего провайдера \"обычный\" DPI. " \
-                                 "Вам поможет HTTPS/Socks прокси, VPN или Tor.")
-    elif http_isup == HTTP_ISUP_ALLUP and http == HTTP_ACCESS_NOBLOCKS \
+    if http_v4 == HTTP_ACCESS_IPBLOCK:
+        if (ipv6_available and http_v6 == HTTP_ACCESS_IPBLOCK) or not ipv6_available:
+            print_http_result("[⚠]", "Ваш провайдер блокирует по IP-адресу. " \
+                                     "Используйте любой способ обхода блокировок.")
+        elif ipv6_available and http_v6 != HTTP_ACCESS_IPBLOCK:
+            print_http_result("[⚠]", "Ваш провайдер блокирует IPv4-сайты по IP-адресу. " \
+                                     "Используйте любой способ обхода блокировок.")
+    elif http_v4 == HTTP_ACCESS_FULLDPI:
+        if (ipv6_available and http_v6 == HTTP_ACCESS_FULLDPI) or not ipv6_available:
+            print_http_result("[⚠]", "У вашего провайдера \"полный\" DPI. Он " \
+                                     "отслеживает ссылки даже внутри прокси, " \
+                                     "поэтому вам следует использовать любое " \
+                                     "шифрованное соединение, например, " \
+                                     "VPN или Tor.")
+        elif ipv6_available and http_v6 != HTTP_ACCESS_FULLDPI:
+            print_http_result("[⚠]", "У вашего провайдера \"полный\" DPI для IPv4. Он " \
+                                     "отслеживает ссылки даже внутри прокси, " \
+                                     "поэтому вам следует использовать любое " \
+                                     "шифрованное соединение, например, " \
+                                     "VPN или Tor.")
+    elif http_v4 == HTTP_ACCESS_IPDPI:
+        if (ipv6_available and http_v6 == HTTP_ACCESS_IPDPI) or not ipv6_available:
+            print_http_result("[⚠]", "У вашего провайдера \"обычный\" DPI. " \
+                                     "Вам поможет HTTPS/Socks прокси, VPN или Tor.")
+        elif ipv6_available and http_v6 != HTTP_ACCESS_IPDPI:
+            print_http_result("[⚠]", "У вашего провайдера \"обычный\" DPI для IPv4. " \
+                                     "Вам поможет HTTPS/Socks прокси, VPN или Tor.")
+    elif http_isup == HTTP_ISUP_ALLUP and http_v4 == HTTP_ACCESS_NOBLOCKS \
             and https == 0:
         print_http_result("[☺]", "Ваш провайдер не блокирует сайты.")
 
