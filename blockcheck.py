@@ -183,7 +183,9 @@ def _get_url(url, proxy=None, ip=None):
         # Manually check certificate as we may need to connect by IP later
         # and handling certificate check in urllib is painful and invasive
         context_hostname_check = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
-        conn = context_hostname_check.wrap_socket(socket.socket(socket.AF_INET6), server_hostname=host)
+        conn = context_hostname_check.wrap_socket(socket.socket(socket.AF_INET6 if \
+            (':' in ip if ip else False) else socket.AF_INET),
+            server_hostname=host)
         conn.settimeout(10)
         try:
             conn.connect((ip if ip else host, 443))
