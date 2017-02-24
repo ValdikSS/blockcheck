@@ -632,12 +632,12 @@ def test_dpi():
 
 def check_ipv6_availability():
     print("Проверка работоспособности IPv6", end='')
-    google_v6addr = _get_a_record("google.com", "AAAA")
-    if (google_v6addr):
-        google_v6 = _get_url("https://www.google.com/", ip=google_v6addr[0])
-        if len(google_v6[1]):
+    v6addr = _get_a_record("ipv6.icanhazip.com", "AAAA")
+    if (v6addr):
+        v6 = _get_url("http://ipv6.icanhazip.com/", ip=v6addr[0])
+        if len(v6[1]):
             print(": IPv6 доступен!")
-            return True
+            return v6[1].strip()
     print(": IPv6 недоступен.")
     return False
 
@@ -645,11 +645,14 @@ def main():
     global ipv6_available
 
     print("BlockCheck v{}".format(VERSION))
+    ipv6_available = check_ipv6_availability()
     ip_isp = _get_ip_and_isp()
     if ip_isp:
-        print("IP: {}, провайдер: {}".format(ip_isp[0], ip_isp[1]))
+        if ipv6_available:
+            print("IP: {}, IPv6: {}, провайдер: {}".format(ip_isp[0], ipv6_available, ip_isp[1]))
+        else:
+            print("IP: {}, провайдер: {}".format(ip_isp[0], ip_isp[1]))
         print()
-    ipv6_available = check_ipv6_availability()
     dnsv4 = test_dns(DNS_IPV4)
     dnsv6 = 0
     if ipv6_available:
