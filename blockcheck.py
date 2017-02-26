@@ -600,6 +600,8 @@ def check_ipv6_availability():
     return False
 
 def main():
+    global ipv6_available
+
     print("BlockCheck v{}".format(VERSION))
     ipv6_available = check_ipv6_availability()
     ip_isp = _get_ip_and_isp()
