@@ -781,8 +781,8 @@ def main():
         print_http_result("[☺]", "Ваш провайдер не блокирует сайты.")
 
     if not disable_report:
-        _get_url('http://blockcheck.antizapret.prostovpn.org/index.php?dns=' + str(dns) + '&http=' + str(http) +
-             '&https=' + str(https) + '&dpi=' + urllib.parse.quote(','.join(dpi)))
+        _get_url('http://blockcheck.antizapret.prostovpn.org/index.php?dns=' + str(dns) + '&http4=' + str(http_v4) +
+             '&http6' + str(http_v6) + '&https=' + str(https) + '&dpi=' + urllib.parse.quote(','.join(dpi)))
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Определитель типа блокировки сайтов у провайдера.')
