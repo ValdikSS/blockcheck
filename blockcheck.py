@@ -65,6 +65,7 @@ force_dpi_check = False
 # End configuration
 
 ipv6_available = False
+debug = False
 
 try:
     import tkinter as tk
@@ -119,6 +120,10 @@ def print(*args, **kwargs):
                    ]
         __builtins__.print(*args, **kwargs)
 
+def print_debug(*args, **kwargs):
+    if debug:
+        print(*args, **kwargs)
+
 def _get_a_record(site, querytype='A', dnsserver=None):
     resolver = dns.resolver.Resolver()
     resolver.timeout = 5
@@ -144,6 +149,7 @@ def _get_a_record_over_google_api(site, querytype='A'):
     result = []
 
     response = _get_url(google_dns_api + "?name={}&type={}".format(site, querytype))
+    print_debug("Google API: {}".format(response))
     if (response[0] != 200):
         return ''
     response_js = json.loads(response[1])
@@ -160,6 +166,7 @@ def _get_a_records(sitelist, querytype='A', dnsserver=None, googleapi=False):
         try:
             if googleapi:
                 responses = _get_a_record_over_google_api(site, querytype)
+                print_debug("Google API вернул {}".format(responses))
             else:
                 responses = _get_a_record(site, querytype, dnsserver)
 
@@ -191,9 +198,11 @@ def _get_url(url, proxy=None, ip=None):
         conn.settimeout(10)
         try:
             conn.connect((ip if ip else host, 443))
-        except ssl.CertificateError:
+        except ssl.CertificateError as e:
+            print_debug("_get_url: ssl.CertificateError", repr(e))
             return (-1, '')
-        except (socket.timeout, socket.error):
+        except (socket.timeout, socket.error) as e:
+            print_debug("_get_url: socket exception", repr(e))
             return (0, '')
         finally:
             try:
@@ -228,9 +237,11 @@ def _get_url(url, proxy=None, ip=None):
     try:
         opened = opener.open(req, timeout=15)
         output = opened.read()
-    except ssl.CertificateError:
+    except ssl.CertificateError as e:
+        print_debug("_get_url: late ssl.CertificateError", repr(e))
         return (-1, '')
     except (urllib.error.URLError, socket.error, socket.timeout) as e:
+        print_debug("_get_url: late socket exception", repr(e))
         if 'CERTIFICATE_VERIFY_FAILED' in str(e):
             return (-1, '')
         return (0, '')
@@ -781,6 +792,7 @@ if __name__ == "__main__":
                             help='Не проверять доступность сайтов через {}.' \
                                     .format(isup_server))
     parser.add_argument('--force-dpi-check', action='store_true', help='Выполнить проверку DPI, даже если провайдер не блокирует сайты.')
+    parser.add_argument('--debug', action='store_true', help='Включить режим отладки.')
     args = parser.parse_args()
 
     if args.console:
@@ -794,6 +806,9 @@ if __name__ == "__main__":
 
     if args.force_dpi_check:
         force_dpi_check = True
+
+    if args.debug:
+        debug = True
 
     if tkusable:
         root = tk.Tk()
