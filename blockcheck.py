@@ -198,7 +198,7 @@ def _get_url(url, proxy=None, ip=None):
         conn.settimeout(10)
         try:
             conn.connect((ip if ip else host, 443))
-        except ssl.CertificateError as e:
+        except (ssl.CertificateError, ssl.SSLError) as e:
             print_debug("_get_url: ssl.CertificateError", repr(e))
             return (-1, '')
         except (socket.timeout, socket.error) as e:
@@ -237,7 +237,7 @@ def _get_url(url, proxy=None, ip=None):
     try:
         opened = opener.open(req, timeout=15)
         output = opened.read()
-    except ssl.CertificateError as e:
+    except (ssl.CertificateError, ssl.SSLError) as e:
         print_debug("_get_url: late ssl.CertificateError", repr(e))
         return (-1, '')
     except (urllib.error.URLError, socket.error, socket.timeout) as e:
