@@ -413,7 +413,12 @@ def test_dns(dnstype=DNS_IPV4):
     else:
         print("\tНесуществующий DNS не вернул адресов (это не ошибка)")
 
-    if not resolved_google_dns or not resolved_default_dns:
+    if not resolved_default_dns:
+        return 5
+        print("[?] Способ блокировки DNS определить не удалось")
+
+    elif not resolved_google_dns:
+        print("[☠] Сторонние DNS блокируются")
         return 4
 
     # Assume that Google API always works and returns correct addresses
