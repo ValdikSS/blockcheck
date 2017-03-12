@@ -797,7 +797,7 @@ if __name__ == "__main__":
                             help='Не проверять доступность сайтов через {}.' \
                                     .format(isup_server))
     parser.add_argument('--force-dpi-check', action='store_true', help='Выполнить проверку DPI, даже если провайдер не блокирует сайты.')
-    parser.add_argument('--debug', action='store_true', help='Включить режим отладки.')
+    parser.add_argument('--debug', action='store_true', help='Включить режим отладки (и --no-report).')
     args = parser.parse_args()
 
     if args.console:
@@ -814,6 +814,7 @@ if __name__ == "__main__":
 
     if args.debug:
         debug = True
+        disable_report = True
 
     if tkusable:
         root = tk.Tk()
