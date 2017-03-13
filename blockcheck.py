@@ -177,7 +177,7 @@ def _get_a_records(sitelist, querytype='A', dnsserver=None, googleapi=False):
         except dns.resolver.NoAnswer:
             pass
         except dns.exception.DNSException:
-            return ""
+            continue
 
     return sorted(result)
 
