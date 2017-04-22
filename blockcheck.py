@@ -33,10 +33,9 @@ http_list = {
         {'status': 200, 'lookfor': 'Rule 34', 'ip': '178.21.23.134', 'ipv6': '2a00:1ca8:2a::26d'},
     'http://rutracker.org/forum/index.php':
         {'status': 200, 'lookfor': 'groupcp.php"', 'ip': '195.82.146.214', 'ipv6': '2a02:4680:22::214'},
-    # a.putinhuylo.com is temporary out of our control
-    #'http://a.putinhuylo.com/':
-    #    {'status': 200, 'lookfor': 'Antizapret', 'ip': '107.150.11.193', 'subdomain': True,
-    #     'is_blacklisted': False},
+    'http://a.putinhuylo.com/':
+        {'status': 200, 'lookfor': 'Antizapret', 'ip': '195.123.209.38', 'subdomain': True,
+         'is_blacklisted': False},
 }
 
 https_list = {'https://rutracker.org/forum/index.php', 'https://lolibooru.moe/', 'https://e621.net/'}
