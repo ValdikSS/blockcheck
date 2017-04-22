@@ -271,6 +271,19 @@ def _get_ip_and_isp():
     except:
         return
 
+def _mask_ip(ipaddr):
+    ipaddr_s = ipaddr.split(".")
+    if len(ipaddr_s) == 4:
+        # IPv4
+        ipaddr_s[3] = 'xxx'
+        return '.'.join(ipaddr_s)
+    ipaddr_s = ipaddr.split(":")
+    if (len(ipaddr_s) >= 4):
+        # IPv6
+        ipaddr_s[len(ipaddr_s) - 1] = 'xxxx'
+        return ':'.join(ipaddr_s)
+    return None
+
 def _dpi_send(host, port, data, fragment_size=0, fragment_count=0):
     sock = socket.create_connection((host, port), 10)
     if fragment_count:
@@ -656,16 +669,19 @@ def check_ipv6_availability():
     return False
 
 def main():
+    ipv6_addr = None
     global ipv6_available
 
     print("BlockCheck v{}".format(VERSION))
     ipv6_available = check_ipv6_availability()
+    if (ipv6_available):
+        ipv6_addr = ipv6_available
     ip_isp = _get_ip_and_isp()
     if ip_isp:
         if ipv6_available:
-            print("IP: {}, IPv6: {}, провайдер: {}".format(ip_isp[0], ipv6_available, ip_isp[1]))
+            print("IP: {}, IPv6: {}, провайдер: {}".format(_mask_ip(ip_isp[0]), _mask_ip(ipv6_addr), ip_isp[1]))
         else:
-            print("IP: {}, провайдер: {}".format(ip_isp[0], ip_isp[1]))
+            print("IP: {}, провайдер: {}".format(_mask_ip(ip_isp[0]), ip_isp[1]))
         print()
     dnsv4 = test_dns(DNS_IPV4)
     dnsv6 = 0
