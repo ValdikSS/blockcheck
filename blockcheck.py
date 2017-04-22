@@ -498,13 +498,15 @@ def test_http_access(by_ip=False):
         print("\tОткрываем ", site)
         # First try to resolve IP address using Google API.
         # Use a static one if this did not work.
-        if by_ip and not ipv6_available:
+        if by_ip:
             domain = list(urllib.parse.urlsplit(site))[1]
             newip = _get_a_record_over_google_api(domain)
-            newipv6 = _get_a_record_over_google_api(domain, 'AAAA')
+            if ipv6_available:
+                newipv6 = _get_a_record_over_google_api(domain, 'AAAA')
+
             if newip:
                 sites[site]['ip'] = newip[0]
-            if newipv6:
+            if ipv6_available and newipv6:
                 sites[site]['ipv6'] = '[' + newipv6[0] + ']'
 
         if ipv6_available:
