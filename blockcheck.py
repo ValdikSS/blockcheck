@@ -16,7 +16,7 @@ import dns.exception
 VERSION="0.0.8.6"
 
 dns_records_list = (
-    "sukebei.nyaa.se", #First server in this list should have both A and AAAA records
+    "rutracker.org", #First server in this list should have both A and AAAA records
     "gelbooru.com",
     "e621.net",
     "2chru.net",
