@@ -121,13 +121,14 @@ printed_text_with_debug = ''
 
 try:
     import tkinter as tk
+    import tkinter.scrolledtext as tkst
     import threading
     import queue
     tkusable = True
 
-    class ThreadSafeConsole(tk.Text):
+    class ThreadSafeConsole(tkst.ScrolledText):
         def __init__(self, master, **options):
-            tk.Text.__init__(self, master, **options)
+            tkst.ScrolledText.__init__(self, master, **options)
             self.queue = queue.Queue()
             self.update_me()
         def write(self, line):
