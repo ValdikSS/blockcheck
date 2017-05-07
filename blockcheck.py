@@ -13,7 +13,7 @@ import dns.resolver
 import dns.exception
 
 # Configuration
-VERSION="0.0.8.6"
+VERSION="0.0.9"
 
 dns_records_list = (
     # First server in this list should have both A and AAAA records
