@@ -55,7 +55,8 @@ http_list = {
          'is_blacklisted': False},
 }
 
-https_list = {'https://rutracker.org/forum/index.php', 'https://lolibooru.moe/', 'https://e621.net/'}
+https_list = {'https://rutracker.org/forum/index.php', 'https://lolibooru.moe/',
+              'https://e621.net/', 'https://dailymotion.com'}
 
 dpi_list =   {
     'rutracker.org':
