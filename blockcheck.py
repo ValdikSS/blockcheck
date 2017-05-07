@@ -261,6 +261,9 @@ def _get_url(url, proxy=None, ip=None):
         if 'CERTIFICATE_VERIFY_FAILED' in str(e):
             return (-1, '')
         return (0, '')
+    except (KeyboardInterrupt, SystemExit) as e:
+        # re-raise exception to send it to caller function
+        raise e
     except Exception as e:
         print("[☠] Неизвестная ошибка:", repr(e))
         return (0, '')
@@ -662,6 +665,9 @@ def test_dpi():
             print("\tПробуем способ «{}» на {}".format(testname, dpisite))
             try:
                 result = _dpi_send(test.get('ip'), 80, test.get('data'), test.get('fragment_size'), test.get('fragment_count'))
+            except (KeyboardInterrupt, SystemExit) as e:
+                # re-raise exception to send it to caller function
+                raise e
             except Exception as e:
                 print("[☠] Ошибка:", repr(e))
             else:
