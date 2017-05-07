@@ -527,6 +527,11 @@ def test_dns(dnstype=DNS_IPV4):
     # Assume that Google API always works and returns correct addresses
     dns_records = resolved_google_api
 
+    if not dns_records:
+        print("[?] Не удалось связаться с Google API. Проверка DNS сломана.")
+        really_bad_fuckup_happened()
+        return 5
+
     if resolved_default_dns == resolved_google_dns:
         if not resolved_fake_dns:
             print("[✓] DNS-записи не подменяются")
