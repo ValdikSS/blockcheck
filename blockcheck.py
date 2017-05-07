@@ -35,11 +35,11 @@ http_list = {
     #    subdomain:      This is non-blacklisted subdomain of a blacklisted domain.
     #    is_blacklisted: True if website is not blacklisted and should be treated so.
 
-    'http://gelbooru.com/': # This page should open in case of DPI, it's not blocked.
-        {'status': 200, 'lookfor': 'Gelbooru is one of the largest', 'ip': '5.178.68.100'},
+    'http://pbooru.com/': # This page should open in case of DPI, it's not blocked.
+        {'status': 200, 'lookfor': 'PoniBooru', 'ip': '104.28.10.65', 'ipv6': '2400:cb00:2048:1::681c:a41'},
 
-    'http://gelbooru.com/index.php?page=post&s=view&id=1989610': # And this should not.
-        {'status': 200, 'lookfor': 'Gelbooru is one of the largest', 'ip': '5.178.68.100'},
+    'http://pbooru.com/index.php?page=post&s=view&id=303026': # And this should not.
+        {'status': 200, 'lookfor': 'PoniBooru', 'ip': '104.28.10.65', 'ipv6': '2400:cb00:2048:1::681c:a41'},
 
     'http://furry.booru.org/':
         {'status': 200, 'lookfor': 'FurryBooru', 'ip': '5.178.68.73', 'ipv6': '2a00:1ca8:ae::10'},
@@ -56,15 +56,17 @@ http_list = {
 }
 
 https_list = {'https://rutracker.org/forum/index.php', 'https://lolibooru.moe/',
-              'https://e621.net/', 'https://dailymotion.com'}
+              'https://e621.net/', 'https://dailymotion.com/'}
 
 dpi_list =   {
+    # These tests are currently performed only using IPv4. IPv6 field is not used.
+
     'rutracker.org':
     {'host': 'rutracker.org', 'urn': '/forum/index.php',
         'lookfor': 'groupcp.php"', 'ip': '195.82.146.214', 'ipv6': '2a02:4680:22::214'},
-    'gelbooru.com':
-    {'host': 'gelbooru.com', 'urn': '/index.php?page=post&s=view&id=1989610',
-        'lookfor': 'Gelbooru is one of the largest', 'ip': '5.178.68.100'},
+    'furry.booru.org':
+    {'host': 'furry.booru.org', 'urn': '/index.php?page=post&s=view&id=1111',
+        'lookfor': 'Related Posts', 'ip': '5.178.68.73', 'ipv6': '2a00:1ca8:ae::10'},
 }
 
 proxy_addr = 'proxy.antizapret.prostovpn.org:3128'
