@@ -88,9 +88,9 @@ dpi_list =   {
     'rutracker.org':
     {'host': 'rutracker.org', 'urn': '/forum/index.php',
         'lookfor': 'groupcp.php"', 'ip': '195.82.146.214', 'ipv6': '2a02:4680:22::214'},
-    'furry.booru.org':
-    {'host': 'furry.booru.org', 'urn': '/index.php?page=post&s=view&id=111173',
-        'lookfor': 'Related Posts', 'ip': '5.178.68.73', 'ipv6': '2a00:1ca8:ae::10'},
+    'pbooru.com':
+    {'host': 'furry.booru.org', 'urn': '/index.php?page=post&s=view&id=303026',
+        'lookfor': 'Related Posts', 'ip': '104.28.10.65', 'ipv6': '2400:cb00:2048:1::681c:a41'},
 }
 
 proxy_addr = 'proxy.antizapret.prostovpn.org:3128'
