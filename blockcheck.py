@@ -988,7 +988,7 @@ if __name__ == "__main__":
         root = tk.Tk()
         root.title("BlockCheck")
         root.protocol("WM_DELETE_WINDOW", tk_terminate)
-        text = ThreadSafeConsole(root)
+        text = ThreadSafeConsole(root, wrap=tk.WORD)
         text.pack(expand=1, fill='both')
         threading.Thread(target=main).start()
         try:
