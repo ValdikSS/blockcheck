@@ -125,8 +125,8 @@ def print(*args, **kwargs):
     global printed_text
     if tkusable:
         for arg in args:
-            text.write(str(arg))
-            printed_text += str(arg)
+            text.write(str(arg) + " ")
+            printed_text += str(arg) + " "
         for key, value in kwargs.items():
             if key == 'end':
                 text.write(value)
@@ -141,7 +141,7 @@ def print(*args, **kwargs):
                    ]
         __builtins__.print(*args, **kwargs)
         for arg in args:
-            printed_text += str(arg)
+            printed_text += str(arg) + " "
         for key, value in kwargs.items():
             if key == 'end':
                 printed_text += value
