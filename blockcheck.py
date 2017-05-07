@@ -103,6 +103,7 @@ isup_server = 'isup.me'
 isup_fmt = 'http://isup.me/{}'
 disable_isup = False #If true, presume that all sites are available
 disable_report = False
+disable_ipv6 = False
 force_dpi_check = False
 
 # End configuration
@@ -762,9 +763,10 @@ def main():
     if latest_version[0] == 200 and latest_version[1].strip() != VERSION:
         print("Доступная новая версия программы: {}. Обновитесь, пожалуйста.".format(latest_version[1].strip()))
         print()
-    ipv6_available = check_ipv6_availability()
-    if (ipv6_available):
-        ipv6_addr = ipv6_available
+    if not disable_ipv6:
+        ipv6_available = check_ipv6_availability()
+        if (ipv6_available):
+            ipv6_addr = ipv6_available
     ip_isp = _get_ip_and_isp()
     if ip_isp:
         if ipv6_available:
@@ -924,6 +926,7 @@ if __name__ == "__main__":
                             help='Не проверять доступность сайтов через {}.' \
                                     .format(isup_server))
     parser.add_argument('--force-dpi-check', action='store_true', help='Выполнить проверку DPI, даже если провайдер не блокирует сайты.')
+    parser.add_argument('--disable-ipv6', action='store_true', help='Отключить поддержку IPv6.')
     parser.add_argument('--debug', action='store_true', help='Включить режим отладки (и --no-report).')
     args = parser.parse_args()
 
@@ -938,6 +941,9 @@ if __name__ == "__main__":
 
     if args.force_dpi_check:
         force_dpi_check = True
+
+    if args.disable_ipv6:
+        disable_ipv6 = True
 
     if args.debug:
         debug = True
