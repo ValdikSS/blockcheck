@@ -82,6 +82,7 @@ force_dpi_check = False
 
 ipv6_available = False
 debug = False
+printed_text = ''
 
 try:
     import tkinter as tk
@@ -121,20 +122,31 @@ except ImportError:
 trans_table = str.maketrans("⚠✗✓«»", '!XV""')
 
 def print(*args, **kwargs):
+    global printed_text
     if tkusable:
         for arg in args:
             text.write(str(arg))
+            printed_text += str(arg)
         for key, value in kwargs.items():
             if key == 'end':
                 text.write(value)
+                printed_text += value
                 return
         text.write("\n")
+        printed_text += "\n"
     else:
         if args and sys.stdout.encoding != 'UTF-8':
             args = [x.translate(trans_table).replace("[☠]", "[FAIL]").replace("[☺]", "[:)]"). \
                     encode(sys.stdout.encoding, 'replace').decode(sys.stdout.encoding) for x in args
                    ]
         __builtins__.print(*args, **kwargs)
+        for arg in args:
+            printed_text += str(arg)
+        for key, value in kwargs.items():
+            if key == 'end':
+                printed_text += value
+                return
+        printed_text += "\n"
 
 def print_debug(*args, **kwargs):
     if debug:
