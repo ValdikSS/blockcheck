@@ -713,6 +713,10 @@ def main():
     print("Для получения корректных результатов используйте DNS-сервер",
         "провайдера и отключите средства обхода блокировок.")
     print()
+    latest_version = _get_url("https://raw.githubusercontent.com/ValdikSS/blockcheck/master/latest_version.txt")
+    if latest_version[0] == 200 and latest_version[1].strip() != VERSION:
+        print("Доступная новая версия программы: {}. Обновитесь, пожалуйста.".format(latest_version[1].strip()))
+        print()
     ipv6_available = check_ipv6_availability()
     if (ipv6_available):
         ipv6_addr = ipv6_available
