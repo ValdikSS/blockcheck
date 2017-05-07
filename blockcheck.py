@@ -89,7 +89,7 @@ dpi_list =   {
     {'host': 'rutracker.org', 'urn': '/forum/index.php',
         'lookfor': 'groupcp.php"', 'ip': '195.82.146.214', 'ipv6': '2a02:4680:22::214'},
     'pbooru.com':
-    {'host': 'furry.booru.org', 'urn': '/index.php?page=post&s=view&id=303026',
+    {'host': 'pbooru.com', 'urn': '/index.php?page=post&s=view&id=303026',
         'lookfor': 'Related Posts', 'ip': '104.28.10.65', 'ipv6': '2400:cb00:2048:1::681c:a41'},
 }
 
