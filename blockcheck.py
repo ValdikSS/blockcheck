@@ -12,6 +12,30 @@ import os.path
 import dns.resolver
 import dns.exception
 
+'''
+
+=================================
+
+IMPORTANT
+
+Make sure to run this program with --no-report option
+if you're editing it, debugging or testing something!
+
+Thank you.
+
+=================================
+
+ВАЖНО
+
+Запускайте программу с опцией --no-report, если
+вы редактируете ее, отлаживаете или тестируете!
+
+Спасибо.
+
+=================================
+
+'''
+
 # Configuration
 VERSION="0.0.9.1"
 
