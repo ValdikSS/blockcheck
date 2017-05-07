@@ -607,7 +607,7 @@ def test_http_access(by_ip=False):
 
             if newip:
                 sites[site]['ip'] = newip[0]
-            if ipv6_available and newipv6:
+            if ipv6_available and sites[site].get('ipv6') and newipv6:
                 sites[site]['ipv6'] = '[' + newipv6[0] + ']'
 
         if ipv6_available:
@@ -617,7 +617,7 @@ def test_http_access(by_ip=False):
             result = _get_url(site, ip=sites[site].get('ip') if by_ip else None)
 
         result_ok = (result[0] == sites[site]['status'] and result[1].find(sites[site]['lookfor']) != -1)
-        if ipv6_available:
+        if ipv6_available and sites[site].get('ipv6'):
             result_v6_ok = (result_v6[0] == sites[site]['status'] and result_v6[1].find(sites[site]['lookfor']) != -1)
         else:
             result_v6_ok = True #Not really
