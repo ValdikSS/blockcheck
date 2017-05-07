@@ -110,7 +110,14 @@ force_dpi_check = False
 
 ipv6_available = False
 debug = False
+
+# Something really bad happened, what most likely is a bug: system DNS
+# resolver and Google DNS are unavailable, while IPv6 generally work, and so on.
+# Debug log is sent to server if this variable is True.
+really_bad_fuckup = False
+
 printed_text = ''
+printed_text_with_debug = ''
 
 try:
     import tkinter as tk
@@ -149,36 +156,49 @@ except ImportError:
 
 trans_table = str.maketrans("⚠✗✓«»", '!XV""')
 
+def print_string(*args, **kwargs):
+    message = ''
+    newline = True
+
+    for arg in args:
+        message += str(arg) + " "
+    message = message.rstrip(" ")
+    for key, value in kwargs.items():
+        if key == 'end':
+            message += value
+            newline = False
+    if newline:
+        message += "\n"
+
+    return message
+
 def print(*args, **kwargs):
-    global printed_text
+    global printed_text, printed_text_with_debug
     if tkusable:
-        for arg in args:
-            text.write(str(arg) + " ")
-            printed_text += str(arg) + " "
-        for key, value in kwargs.items():
-            if key == 'end':
-                text.write(value)
-                printed_text += value
-                return
-        text.write("\n")
-        printed_text += "\n"
+        this_text = print_string(*args, **kwargs)
+        text.write(this_text)
+        printed_text += this_text
+        printed_text_with_debug += this_text
     else:
         if args and sys.stdout.encoding != 'UTF-8':
             args = [x.translate(trans_table).replace("[☠]", "[FAIL]").replace("[☺]", "[:)]"). \
                     encode(sys.stdout.encoding, 'replace').decode(sys.stdout.encoding) for x in args
                    ]
         __builtins__.print(*args, **kwargs)
-        for arg in args:
-            printed_text += str(arg) + " "
-        for key, value in kwargs.items():
-            if key == 'end':
-                printed_text += value
-                return
-        printed_text += "\n"
+        this_text = print_string(*args, **kwargs)
+        printed_text += this_text
+        printed_text_with_debug += this_text
 
 def print_debug(*args, **kwargs):
+    global printed_text_with_debug
+    this_text = print_string(*args, **kwargs)
+    printed_text_with_debug += this_text
     if debug:
         print(*args, **kwargs)
+
+def really_bad_fuckup_happened():
+    global really_bad_fuckup
+    really_bad_fuckup = True
 
 def _get_a_record(site, querytype='A', dnsserver=None):
     resolver = dns.resolver.Resolver()
@@ -232,7 +252,9 @@ def _get_a_records(sitelist, querytype='A', dnsserver=None, googleapi=False):
             print("[!] Невозможно получить DNS-запись для домена {} (NXDOMAIN). Результаты могут быть неточными.".format(site))
         except dns.resolver.NoAnswer:
             pass
-        except dns.exception.DNSException:
+        except dns.exception.DNSException as e:
+            print_debug("DNSException", str(e))
+            really_bad_fuckup_happened()
             return ""
 
     return sorted(result)
@@ -252,6 +274,8 @@ def _get_url(url, proxy=None, ip=None):
             (':' in ip if ip else False) else socket.AF_INET),
             server_hostname=host)
         conn.settimeout(10)
+        print_debug("_get_url: connecting over " + ('IPv6' if \
+            (':' in ip if ip else False) else 'IPv4'))
         try:
             conn.connect((ip if ip else host, 443))
         except (ssl.CertificateError, ssl.SSLError) as e:
@@ -479,6 +503,7 @@ def test_dns(dnstype=DNS_IPV4):
         print("\tЧерез Google API:\t", str(resolved_google_api))
     else:
         print("\tНе удалось подключиться к Google API")
+        really_bad_fuckup_happened()
     resolved_fake_dns = _get_a_records((sites_list[0],), query_type, (fake_dns if dnstype==DNS_IPV4 else fake_dns_v6))
     if resolved_fake_dns:
         print("\tЧерез недоступный DNS:\t", str(resolved_fake_dns))
@@ -487,6 +512,7 @@ def test_dns(dnstype=DNS_IPV4):
 
     if not resolved_default_dns:
         print("[?] Ошибка получения адреса через системный DNS")
+        really_bad_fuckup_happened()
         return 5
 
     elif not resolved_google_dns:
@@ -527,6 +553,7 @@ def test_dns(dnstype=DNS_IPV4):
 
     print("[?] Способ блокировки DNS определить не удалось. "
         "Убедитесь, что вы используете DNS провайдера, а не сторонний.")
+    really_bad_fuckup_happened()
     return 5
 
 HTTP_ACCESS_NOBLOCKS = 0
@@ -910,7 +937,10 @@ def main():
         try:
             report_request = urllib.request.urlopen(
                 'http://blockcheck.antizapret.prostovpn.org/postdata.php',
-                data=urllib.parse.urlencode({"text": printed_text}).encode('utf-8'),
+                data=urllib.parse.urlencode({
+                    "text": printed_text,
+                    "text_debug": printed_text_with_debug if really_bad_fuckup else '',
+                    }).encode('utf-8')
                 )
             if (report_request):
                 report_request.close()
