@@ -16,23 +16,40 @@ import dns.exception
 VERSION="0.0.8.6"
 
 dns_records_list = (
-    "rutracker.org", #First server in this list should have both A and AAAA records
-    "gelbooru.com",
-    "e621.net",
-    "2chru.net",
+    # First server in this list should have both A and AAAA records
+
+    "rutracker.org",      # Blocked by domain name.
+    "gelbooru.com",       # Only several URLs are blocked, main page is not.
+    "e621.net",           # Blocked by domain name. Website is HTTP only.
+    "danbooru.donmai.us", # Blocked by root URL.
+    "dailymotion.com",    # Blocked by domain name.
+    "zello.com",          # Blocked by domain name.
 )
 
 http_list = {
-    'http://gelbooru.com/':
+    # Parameters:
+    #    status:         HTTP response code
+    #    lookfor:        Substring to search in HTTP reply body
+    #    ip:             IPv4 address. Used only if hostname can't be resolved using Google API.
+    #    ipv6:           IPv6 address
+    #    subdomain:      This is non-blacklisted subdomain of a blacklisted domain.
+    #    is_blacklisted: True if website is not blacklisted and should be treated so.
+
+    'http://gelbooru.com/': # This page should open in case of DPI, it's not blocked.
         {'status': 200, 'lookfor': 'Gelbooru is one of the largest', 'ip': '5.178.68.100'},
-    'http://gelbooru.com/index.php?page=post&s=view&id=1989610':
+
+    'http://gelbooru.com/index.php?page=post&s=view&id=1989610': # And this should not.
         {'status': 200, 'lookfor': 'Gelbooru is one of the largest', 'ip': '5.178.68.100'},
-    'http://rule34.xxx/':
-        {'status': 200, 'lookfor': 'Rule 34', 'ip': '178.21.23.134', 'ipv6': '2a00:1ca8:2a::26d'},
-    'http://rule34.xxx/index.php?page=post&s=view&id=879177':
-        {'status': 200, 'lookfor': 'Rule 34', 'ip': '178.21.23.134', 'ipv6': '2a00:1ca8:2a::26d'},
+
+    'http://furry.booru.org/':
+        {'status': 200, 'lookfor': 'FurryBooru', 'ip': '5.178.68.73', 'ipv6': '2a00:1ca8:ae::10'},
+
+    'http://furry.booru.org/index.php?page=post&s=view&id=1111':
+        {'status': 200, 'lookfor': 'FurryBooru', 'ip': '5.178.68.73', 'ipv6': '2a00:1ca8:ae::10'},
+
     'http://rutracker.org/forum/index.php':
         {'status': 200, 'lookfor': 'groupcp.php"', 'ip': '195.82.146.214', 'ipv6': '2a02:4680:22::214'},
+
     'http://a.putinhuylo.com/':
         {'status': 200, 'lookfor': 'Antizapret', 'ip': '195.123.209.38', 'subdomain': True,
          'is_blacklisted': False},
