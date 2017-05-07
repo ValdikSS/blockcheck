@@ -697,6 +697,9 @@ def main():
     global ipv6_available
 
     print("BlockCheck v{}".format(VERSION))
+    print("Для получения корректных результатов используйте DNS-сервер",
+        "провайдера и отключите средства обхода блокировок.")
+    print()
     ipv6_available = check_ipv6_availability()
     if (ipv6_available):
         ipv6_addr = ipv6_available
