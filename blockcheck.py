@@ -461,8 +461,8 @@ def test_dns(dnstype=DNS_IPV4):
         print("\tНесуществующий DNS не вернул адресов (это не ошибка)")
 
     if not resolved_default_dns:
+        print("[?] Ошибка получения адреса через системный DNS")
         return 5
-        print("[?] Способ блокировки DNS определить не удалось")
 
     elif not resolved_google_dns:
         print("[☠] Сторонние DNS блокируются")
@@ -478,6 +478,8 @@ def test_dns(dnstype=DNS_IPV4):
             return 0
 
         if resolved_default_dns == dns_records:
+            # Resolved DNS = Google DNS = Google API, and fake
+            # DNS resolved something.
             print("[✓] DNS-записи не подменяются")
             print("[☠] DNS перенаправляется")
             return 1
@@ -492,7 +494,14 @@ def test_dns(dnstype=DNS_IPV4):
             print("[✓] DNS не перенаправляется")
             return 3
 
-    print("[?] Способ блокировки DNS определить не удалось")
+    if resolved_fake_dns:
+        # Resolved DNS != Google DNS != Google API, and fake DNS resolved something.
+        print("[☠] DNS-записи подменяются")
+        print("[☠] DNS перенаправляется")
+        return 2
+
+    print("[?] Способ блокировки DNS определить не удалось. "
+        "Убедитесь, что вы используете DNS провайдера, а не сторонний.")
     return 5
 
 HTTP_ACCESS_NOBLOCKS = 0
@@ -744,7 +753,14 @@ def main():
         dpi = test_dpi()
         print()
     print("[!] Результат:")
-    if dnsv4 == 4:
+    if dnsv4 == 5:
+        print("[⚠] Не удалось определить способ блокировки IPv4 DNS.\n",
+              "Верните настройки DNS провайдера, если вы используете сторонний DNS-сервер.",
+              "Если вы используете DNS провайдера, возможно, ответы DNS модифицирует вышестоящий"
+              "провайдер.\n",
+              "Вам следует использовать шифрованный канал до DNS-серверов, например, через VPN, Tor, " + \
+              "HTTPS/Socks прокси или DNSCrypt.")
+    elif dnsv4 == 4:
         print("[⚠] Ваш провайдер блокирует сторонние IPv4 DNS-серверы.\n",
               "Вам следует использовать шифрованный канал до DNS-серверов, например, через VPN, Tor, " + \
               "HTTPS/Socks прокси или DNSCrypt.")
@@ -763,7 +779,14 @@ def main():
               "блокировок это не поможет.")
 
     if ipv6_available:
-        if dnsv6 == 4:
+        if dnsv6 == 5:
+            print("[⚠] Не удалось определить способ блокировки IPv6 DNS.\n",
+                "Верните настройки DNS провайдера, если вы используете сторонний DNS-сервер.",
+                "Если вы используете DNS провайдера, возможно, ответы DNS модифицирует вышестоящий"
+                "провайдер.\n",
+                "Вам следует использовать шифрованный канал до DNS-серверов, например, через VPN, Tor, " + \
+                "HTTPS/Socks прокси или DNSCrypt.")
+        elif dnsv6 == 4:
             print("[⚠] Ваш провайдер блокирует сторонние IPv6 DNS-серверы.\n",
                 "Вам следует использовать шифрованный канал до DNS-серверов, например, через VPN, Tor, " + \
                 "HTTPS/Socks прокси или DNSCrypt.")
