@@ -149,6 +149,10 @@ try:
                 pass
             self.after(100, self.update_me)
 
+    def tk_terminate():
+        root.destroy()
+        raise SystemExit
+
 except ImportError:
     tkusable = False
 
@@ -983,10 +987,14 @@ if __name__ == "__main__":
     if tkusable:
         root = tk.Tk()
         root.title("BlockCheck")
+        root.protocol("WM_DELETE_WINDOW", tk_terminate)
         text = ThreadSafeConsole(root)
         text.pack(expand=1, fill='both')
         threading.Thread(target=main).start()
-        root.mainloop()
+        try:
+            root.mainloop()
+        except SystemExit:
+            os._exit(0)
     else:
         try:
             main()
