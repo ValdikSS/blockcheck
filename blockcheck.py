@@ -683,6 +683,16 @@ def test_dpi():
     dpiresults = []
     for dpisite in dpi_list:
         site = dpi_list[dpisite]
+        # First try to resolve IP address using Google API.
+        # Use a static one if this did not work.
+        newip = _get_a_record_over_google_api(site['host'])
+        if newip:
+            site['ip'] = newip[0]
+        if ipv6_available:
+            newip = _get_a_record_over_google_api(site['host'], 'AAAA')
+            if newip:
+                site['ipv6'] = newip[0]
+
         dpi_built_tests = _dpi_build_tests(site['host'], site['urn'], site['ip'], site['lookfor'])
         for testname in dpi_built_tests:
             test = dpi_built_tests[testname]
