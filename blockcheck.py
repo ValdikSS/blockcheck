@@ -44,7 +44,7 @@ http_list = {
     'http://furry.booru.org/':
         {'status': 200, 'lookfor': 'FurryBooru', 'ip': '5.178.68.73', 'ipv6': '2a00:1ca8:ae::10'},
 
-    'http://furry.booru.org/index.php?page=post&s=view&id=1111':
+    'http://furry.booru.org/index.php?page=post&s=view&id=111173':
         {'status': 200, 'lookfor': 'FurryBooru', 'ip': '5.178.68.73', 'ipv6': '2a00:1ca8:ae::10'},
 
     'http://rutracker.org/forum/index.php':
@@ -65,7 +65,7 @@ dpi_list =   {
     {'host': 'rutracker.org', 'urn': '/forum/index.php',
         'lookfor': 'groupcp.php"', 'ip': '195.82.146.214', 'ipv6': '2a02:4680:22::214'},
     'furry.booru.org':
-    {'host': 'furry.booru.org', 'urn': '/index.php?page=post&s=view&id=1111',
+    {'host': 'furry.booru.org', 'urn': '/index.php?page=post&s=view&id=111173',
         'lookfor': 'Related Posts', 'ip': '5.178.68.73', 'ipv6': '2a00:1ca8:ae::10'},
 }
 
