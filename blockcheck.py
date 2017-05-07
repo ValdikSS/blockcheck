@@ -841,13 +841,21 @@ def main():
         print_http_result("[☺]", "Ваш провайдер не блокирует сайты.")
 
     if not disable_report:
-        _get_url('http://blockcheck.antizapret.prostovpn.org/index.php?dns=' + str(dns) + '&http4=' + str(http_v4) +
-             '&http6' + str(http_v6) + '&https=' + str(https) + '&dpi=' + urllib.parse.quote(','.join(dpi)))
+        try:
+            report_request = urllib.request.urlopen(
+                'http://blockcheck.antizapret.prostovpn.org/postdata.php',
+                data=urllib.parse.urlencode({"text": printed_text}).encode('utf-8'),
+                )
+            if (report_request):
+                report_request.close()
+        except urllib.error.URLError as e:
+            # keep it silent
+            pass
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Определитель типа блокировки сайтов у провайдера.')
     parser.add_argument('--console', action='store_true', help='Консольный режим. Отключает Tkinter GUI.')
-    parser.add_argument('--no-report', action='store_true', help='Не отправлять результат на сервер.')
+    parser.add_argument('--no-report', action='store_true', help='Не отправлять результат на сервер (отправляется только выводимый текст).')
     parser.add_argument('--no-isup', action='store_true',
                             help='Не проверять доступность сайтов через {}.' \
                                     .format(isup_server))
