@@ -959,6 +959,9 @@ def main():
             pass
 
 if __name__ == "__main__":
+    if getattr(sys, 'frozen', False):
+        os.environ['SSL_CERT_FILE'] = os.path.join(sys._MEIPASS, 'lib', 'ca-certificates.crt')
+
     parser = argparse.ArgumentParser(description='Определитель типа блокировки сайтов у провайдера.')
     parser.add_argument('--console', action='store_true', help='Консольный режим. Отключает Tkinter GUI.')
     parser.add_argument('--no-report', action='store_true', help='Не отправлять результат на сервер (отправляется только выводимый текст).')
