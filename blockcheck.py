@@ -1004,4 +1004,4 @@ if __name__ == "__main__":
         try:
             main()
         except (KeyboardInterrupt, SystemExit):
-            quit(1)
+            sys.exit(1)
