@@ -4,9 +4,21 @@ from PyInstaller.utils.hooks import exec_statement
 sys_os = exec_statement("""
     import sys
     print(sys.platform)""").strip()
-ca_bundle = []
+
+add_datas = []
+hooks_p = []
+hooks_r = []
+
 if sys_os == 'linux':
     ca_bundle = [('/etc/ssl/certs/ca-certificates.crt', 'lib')]
+    add_datas = ca_bundle
+
+if sys_os == 'darwin':
+    add_datas = [('/System/Library/Frameworks/Tk.framework/Tk', '.'),
+                 ('/System/Library/Frameworks/Tcl.framework/Versions/8.5/Tcl', '.'),
+                ]
+    hooks_p = ['osx_hooks']
+    hooks_r = ['osx_hooks/loader/pyi_rth__tkinter.py']
 
 block_cipher = None
 
@@ -14,10 +26,10 @@ block_cipher = None
 a = Analysis(['blockcheck.py'],
              pathex=[],
              binaries=[],
-             datas=ca_bundle,
+             datas=add_datas,
              hiddenimports=[],
-             hookspath=[],
-             runtime_hooks=[],
+             hookspath=hooks_p,
+             runtime_hooks=hooks_r,
              excludes=[],
              win_no_prefer_redirects=False,
              win_private_assemblies=False,
@@ -52,3 +64,9 @@ exe = EXE(pyz,
           strip=False,
           upx=True,
           console=False )
+
+if sys_os == 'darwin':
+    app = BUNDLE(exe,
+                 name='blockcheck.app',
+                 icon=None,
+                 bundle_identifier=None)
