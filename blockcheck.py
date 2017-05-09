@@ -367,7 +367,7 @@ def _mask_ip(ipaddr):
         return str(ipaddr_s.network).replace('0/24', 'xxx')
     if ipaddr_s.version == 6:
         ipaddr_s = ipaddress.ip_interface(ipaddr + '/48')
-        return str(ipaddr_s.network).replace(':/48', 'xxxx:xxxx:xxxx:xxxx:xxxx')
+        return str(ipaddr_s.network).replace(':/48', 'xxxx::')
     return None
 
 def _dpi_send(host, port, data, fragment_size=0, fragment_count=0):
