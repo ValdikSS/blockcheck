@@ -11,6 +11,7 @@ import sys
 import os.path
 import dns.resolver
 import dns.exception
+import ipaddress
 
 '''
 
@@ -360,16 +361,13 @@ def _get_ip_and_isp():
         return
 
 def _mask_ip(ipaddr):
-    ipaddr_s = ipaddr.split(".")
-    if len(ipaddr_s) == 4:
-        # IPv4
-        ipaddr_s[3] = 'xxx'
-        return '.'.join(ipaddr_s)
-    ipaddr_s = ipaddr.split(":")
-    if (len(ipaddr_s) >= 4):
-        # IPv6
-        ipaddr_s[len(ipaddr_s) - 1] = 'xxxx'
-        return ':'.join(ipaddr_s)
+    ipaddr_s = ipaddress.ip_address(ipaddr)
+    if ipaddr_s.version == 4:
+        ipaddr_s = ipaddress.ip_interface(ipaddr + '/24')
+        return str(ipaddr_s.network).replace('0/24', 'xxx')
+    if ipaddr_s.version == 6:
+        ipaddr_s = ipaddress.ip_interface(ipaddr + '/48')
+        return str(ipaddr_s.network).replace(':/48', 'xxxx:xxxx:xxxx:xxxx:xxxx')
     return None
 
 def _dpi_send(host, port, data, fragment_size=0, fragment_count=0):
