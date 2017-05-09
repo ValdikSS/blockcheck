@@ -781,8 +781,11 @@ def check_ipv6_availability():
     if (v6addr):
         v6 = _get_url("http://ipv6.icanhazip.com/", ip=v6addr[0])
         if len(v6[1]):
-            print(": IPv6 доступен!")
-            return v6[1].strip()
+            v6src = v6[1].strip()
+            if (ipaddress.IPv6Address(v6src).teredo == None and 
+                ipaddress.IPv6Address(v6src).sixtofour == None):
+                print(": IPv6 доступен! (Teredo/6to4 игнорируем)")
+            return v6src
     print(": IPv6 недоступен.")
     return False
 
