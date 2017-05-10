@@ -105,6 +105,7 @@ isup_fmt = 'http://isup.me/{}'
 disable_isup = False #If true, presume that all sites are available
 disable_report = False
 disable_ipv6 = False
+force_ipv6 = False
 force_dpi_check = False
 
 # End configuration
@@ -782,10 +783,13 @@ def check_ipv6_availability():
         v6 = _get_url("http://ipv6.icanhazip.com/", ip=v6addr[0])
         if len(v6[1]):
             v6src = v6[1].strip()
-            if (ipaddress.IPv6Address(v6src).teredo == None and 
+            if force_ipv6 == True:
+                print(": IPv6 доступен!")
+                return v6src
+            elif (ipaddress.IPv6Address(v6src).teredo == None and 
                 ipaddress.IPv6Address(v6src).sixtofour == None):
                 print(": IPv6 доступен! (Teredo/6to4 игнорируем)")
-            return v6src
+                return v6src
     print(": IPv6 недоступен.")
     return False
 
@@ -971,6 +975,7 @@ if __name__ == "__main__":
                                     .format(isup_server))
     parser.add_argument('--force-dpi-check', action='store_true', help='Выполнить проверку DPI, даже если провайдер не блокирует сайты.')
     parser.add_argument('--disable-ipv6', action='store_true', help='Отключить поддержку IPv6.')
+    parser.add_argument('--force-ipv6', action='store_true', help='Игнорировать обнаружение тунелей')
     parser.add_argument('--debug', action='store_true', help='Включить режим отладки (и --no-report).')
     args = parser.parse_args()
 
@@ -988,6 +993,9 @@ if __name__ == "__main__":
 
     if args.disable_ipv6:
         disable_ipv6 = True
+    
+    if args.force_ipv6:
+        force_ipv6 = True
 
     if args.debug:
         debug = True
