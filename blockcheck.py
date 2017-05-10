@@ -264,7 +264,6 @@ def _get_a_records(sitelist, querytype='A', dnsserver=None, googleapi=False):
         except dns.exception.DNSException as e:
             print_debug("DNSException:", str(e))
             really_bad_fuckup_happened()
-            return ""
 
     return sorted(result)
 
