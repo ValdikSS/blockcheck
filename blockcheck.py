@@ -81,7 +81,7 @@ http_list = {
 }
 
 https_list = {'https://rutracker.org/forum/index.php', 'https://lolibooru.moe/',
-              'https://e621.net/', 'https://dailymotion.com/'}
+              'https://e621.net/', 'https://www.dailymotion.com/'}
 
 dpi_list =   {
     # These tests are currently performed only using IPv4. IPv6 field is not used.
@@ -713,7 +713,14 @@ def test_https_cert():
     siteresults = []
     for site in sites:
         print("\tОткрываем ", site)
-        result = _get_url(site, None)
+        domain = list(urllib.parse.urlsplit(site))[1]
+        newip = _get_a_record_over_google_api(domain)
+        if newip:
+            newip = newip[0]
+            result = _get_url(site, ip=newip)
+        else:
+            print_debug("Can't resolve IP for", site)
+            result = _get_url(site)
         if result[0] == -1:
             print("[☠] Сертификат подменяется")
             siteresults.append(False)
