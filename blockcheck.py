@@ -217,11 +217,14 @@ def _get_a_record(site, querytype='A', dnsserver=None):
     result = []
     while len(resolver.nameservers):
         try:
-            for item in resolver.query(site, querytype).rrset.items:
+            resolved = resolver.query(site, querytype)
+            print_debug(str(resolved.response))
+            for item in resolved.rrset.items:
                 result.append(item.to_text())
             return result
 
         except dns.exception.Timeout:
+            print_debug("DNS Timeout for", site, "using", resolver.nameservers[0])
             resolver.nameservers.remove(resolver.nameservers[0])
 
     # If all the requests failed
@@ -257,9 +260,9 @@ def _get_a_records(sitelist, querytype='A', dnsserver=None, googleapi=False):
         except dns.resolver.NXDOMAIN:
             print("[!] Невозможно получить DNS-запись для домена {} (NXDOMAIN). Результаты могут быть неточными.".format(site))
         except dns.resolver.NoAnswer:
-            pass
+            print_debug("DNS NoAnswer:", site)
         except dns.exception.DNSException as e:
-            print_debug("DNSException", str(e))
+            print_debug("DNSException:", str(e))
             really_bad_fuckup_happened()
             return ""
 
