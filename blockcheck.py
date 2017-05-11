@@ -790,7 +790,7 @@ def check_ipv6_availability():
                 print(": IPv6 доступен!")
                 return v6src
             else:
-                print (": обнаружен Teredo или 6to4, игнорируем.")
+                print (": обнаружен туннель Teredo или 6to4, игнорируем.")
                 return False
     print(": IPv6 недоступен.")
     return False
