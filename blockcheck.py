@@ -786,7 +786,7 @@ def check_ipv6_availability():
             if force_ipv6:
                 print(": IPv6 доступен!")
                 return v6src
-            elif ipaddress.IPv6Address(v6src).teredo is None and ipaddress.IPv6Address(v6src).sixtofour is None:
+            elif not ipaddress.IPv6Address(v6src).teredo and not ipaddress.IPv6Address(v6src).sixtofour:
                 print(": IPv6 доступен!")
                 return v6src
             else:
