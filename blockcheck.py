@@ -783,13 +783,15 @@ def check_ipv6_availability():
         v6 = _get_url("http://ipv6.icanhazip.com/", ip=v6addr[0])
         if len(v6[1]):
             v6src = v6[1].strip()
-            if force_ipv6 == True:
+            if force_ipv6:
                 print(": IPv6 доступен!")
                 return v6src
-            elif (ipaddress.IPv6Address(v6src).teredo == None and 
-                ipaddress.IPv6Address(v6src).sixtofour == None):
-                print(": IPv6 доступен! (Teredo/6to4 игнорируем)")
+            elif ipaddress.IPv6Address(v6src).teredo is None and ipaddress.IPv6Address(v6src).sixtofour is None:
+                print(": IPv6 доступен!")
                 return v6src
+            else:
+                print (": обнаружен Teredo или 6to4, игнорируем.")
+                return False
     print(": IPv6 недоступен.")
     return False
 
