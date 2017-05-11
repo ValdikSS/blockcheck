@@ -832,7 +832,7 @@ def main():
             asn6 = get_nicinfo(ipv6_addr)
             if asn4 != asn6:
                 ipv6_available = False
-                print ("Вероятно у вас IPv6 туннель, отключаем проверку IPv6")
+                print("Вероятно у вас IPv6 туннель, отключаем проверку IPv6")
         else:
             print("IP: {}, провайдер: {}".format(_mask_ip(ip_isp[0]), ip_isp[1]))
         print()
