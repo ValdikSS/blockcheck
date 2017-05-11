@@ -975,7 +975,7 @@ if __name__ == "__main__":
                                     .format(isup_server))
     parser.add_argument('--force-dpi-check', action='store_true', help='Выполнить проверку DPI, даже если провайдер не блокирует сайты.')
     parser.add_argument('--disable-ipv6', action='store_true', help='Отключить поддержку IPv6.')
-    parser.add_argument('--force-ipv6', action='store_true', help='Игнорировать обнаружение тунелей')
+    parser.add_argument('--force-ipv6', action='store_true', help='Игнорировать обнаружение туннелей')
     parser.add_argument('--debug', action='store_true', help='Включить режим отладки (и --no-report).')
     args = parser.parse_args()
 
