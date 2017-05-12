@@ -806,7 +806,7 @@ def check_ipv6_availability():
 def get_ispinfo(ipaddr):
     rdap_response = IPWhois(ipaddr)
     nicinfo = rdap_response.lookup_rdap(depth=1)
-    return nicinfo
+    return nicinfo['asn']
 
 def main():
     ipv6_addr = None
