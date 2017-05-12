@@ -803,7 +803,7 @@ def check_ipv6_availability():
     print(": IPv6 недоступен.")
     return False
 
-def get_nicinfo(ipaddr):
+def get_ispinfo(ipaddr):
     rdap_response = IPWhois(ipaddr)
     nicinfo = rdap_response.lookup_rdap(depth=1)
     return nicinfo
@@ -828,11 +828,11 @@ def main():
     if ip_isp:
         if ipv6_available:
             print("IP: {}, IPv6: {}, провайдер: {}".format(_mask_ip(ip_isp[0]), _mask_ip(ipv6_addr), ip_isp[1]))
-            asn4 = get_nicinfo(ip_isp[0])
-            asn6 = get_nicinfo(ipv6_addr)
+            asn4 = get_ispinfo(ip_isp[0])
+            asn6 = get_ispinfo(ipv6_addr)
             if asn4 != asn6 and not force_ipv6:
                 ipv6_available = False
-                print("Вероятно у вас IPv6 туннель, отключаем проверку IPv6")
+                print("Вероятно, у вас IPv6-туннель. Проверка IPv6 отключена.")
         else:
             print("IP: {}, провайдер: {}".format(_mask_ip(ip_isp[0]), ip_isp[1]))
         print()
