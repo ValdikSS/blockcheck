@@ -326,6 +326,7 @@ def _get_url(url, proxy=None, ip=None):
     try:
         opened = opener.open(req, timeout=15)
         output = opened.read()
+        opened.close()
     except (ssl.CertificateError, ssl.SSLError) as e:
         print_debug("_get_url: late ssl.CertificateError", repr(e))
         return (-1, '')
