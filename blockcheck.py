@@ -973,6 +973,20 @@ def main():
             # keep it silent
             pass
 
+        if ip_isp:
+            need_help_isp_list = _get_url(
+                "https://raw.githubusercontent.com/ValdikSS/blockcheck/master/we_need_your_help_isp_list.txt")
+            if need_help_isp_list[0] == 200:
+                need_help_isp_list = need_help_isp_list[1]
+                for need_help_isp in need_help_isp_list.split("\n"):
+                    need_help_isp = need_help_isp.strip().lower()
+                    if need_help_isp and need_help_isp in ip_isp[1].lower():
+                        print()
+                        print("[⚠] Нам нужна ваша помощь!\n",
+                              "Пожалуйста, помогите собрать расширенные данные о вашем провайдере:\n",
+                              "https://github.com/ValdikSS/blockcheck/wiki/Нужна-ваша-помощь"
+                              )
+
 if __name__ == "__main__":
     if getattr(sys, 'frozen', False):
         os.environ['SSL_CERT_FILE'] = os.path.join(sys._MEIPASS, 'lib', 'ca-certificates.crt')
