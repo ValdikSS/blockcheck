@@ -808,7 +808,7 @@ def get_ispinfo(ipaddr):
         rdap_response = IPWhois(ipaddr)
         ispinfo = rdap_response.lookup_rdap(depth=1)
         return ispinfo['asn']
-    except:
+    except(ipwhois.exceptions.ASNRegistryError, ipwhois.exceptions.ASNLookupError, ASNParseError, ASNOriginLookupError):
         return False
 
 def main():
