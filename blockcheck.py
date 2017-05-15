@@ -12,6 +12,7 @@ import os.path
 import dns.resolver
 import dns.exception
 import ipaddress
+from ipwhois import IPWhois
 
 '''
 
@@ -803,6 +804,14 @@ def check_ipv6_availability():
     print(": IPv6 недоступен.")
     return False
 
+def get_ispinfo(ipaddr):
+    try:
+        rdap_response = IPWhois(ipaddr)
+        ispinfo = rdap_response.lookup_rdap(depth=1)
+        return ispinfo['asn']
+    except(ipwhois.exceptions.ASNRegistryError, ipwhois.exceptions.ASNLookupError, ASNParseError, ASNOriginLookupError):
+        return False
+
 def main():
     ipv6_addr = None
     global ipv6_available
@@ -823,6 +832,12 @@ def main():
     if ip_isp:
         if ipv6_available:
             print("IP: {}, IPv6: {}, провайдер: {}".format(_mask_ip(ip_isp[0]), _mask_ip(ipv6_addr), ip_isp[1]))
+            asn4 = get_ispinfo(ip_isp[0])
+            asn6 = get_ispinfo(ipv6_addr)
+            if not asn4 or not asn6:
+                if asn4 != asn6 and not force_ipv6:
+                    ipv6_available = False
+                    print("Вероятно, у вас IPv6-туннель. Проверка IPv6 отключена.")
         else:
             print("IP: {}, провайдер: {}".format(_mask_ip(ip_isp[0]), ip_isp[1]))
         print()
