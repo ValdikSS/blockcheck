@@ -162,7 +162,7 @@ except ImportError:
     class ThreadSafeConsole():
         pass
 
-trans_table = str.maketrans("⚠✗✓«»", '!XV""')
+trans_table = str.maketrans("⚠✗✓«»⁇", '!XV""?')
 
 def print_string(*args, **kwargs):
     message = ''
