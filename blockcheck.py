@@ -242,7 +242,8 @@ def _get_a_record_over_google_api(site, querytype='A'):
     response_js = json.loads(response[1])
     try:
         for dnsanswer in response_js['Answer']:
-            result.append(dnsanswer['data'])
+            if dnsanswer['type'] in (1, 28):
+                result.append(dnsanswer['data'])
     except KeyError:
         pass
     return result
