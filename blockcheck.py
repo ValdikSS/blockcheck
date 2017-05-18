@@ -889,6 +889,10 @@ def main():
     print("Для получения корректных результатов используйте DNS-сервер",
         "провайдера и отключите средства обхода блокировок.")
     print()
+    print("Интерпретация результатов для Украины будет неправильной, она все еще заточена под Россию.")
+    print("Попытка открытия сайта через прокси во время тестов всегда будет выдавать ошибку. "
+          "Блокировки по IP будут ложно определяться как DPI.")
+    print()
     latest_version = _get_url("https://raw.githubusercontent.com/ValdikSS/blockcheck/master/latest_version.txt")
     if latest_version[0] == 200 and latest_version[1].strip() != VERSION:
         print("Доступная новая версия программы: {}. Обновитесь, пожалуйста.".format(latest_version[1].strip()))
