@@ -44,12 +44,23 @@ VERSION="0.0.9.3"
 dns_records_list = (
     # First server in this list should have both A and AAAA records
 
-    "rutracker.org",      # Blocked by domain name.
-    "gelbooru.com",       # Only several URLs are blocked, main page is not.
-    "e621.net",           # Blocked by domain name. Website is HTTP only.
-    "danbooru.donmai.us", # Blocked by root URL.
-    "dailymotion.com",    # Blocked by domain name.
-    "zello.com",          # Blocked by domain name.
+    "mail.ru",
+    "www.mail.ru",
+    "ya.ru",
+    "yandex.ru",
+    "www.yandex.ru",
+    "news.yandex.ru",
+    "family.yandex.ru",
+    "www.yandex.ua",
+    "www.kaspersky.ru",
+    "www.drweb.ru",
+    "auto.ru",
+    "www.kinopoisk.ru",
+    "vk.com",
+    "www.vk.com",
+    "auth.vk.com",
+    "ok.ru",
+    "www.ok.ru",
 )
 
 http_list = {
@@ -61,38 +72,59 @@ http_list = {
     #    subdomain:      This is non-blacklisted subdomain of a blacklisted domain.
     #    is_blacklisted: True if website is not blacklisted and should be treated so.
 
-    'http://pbooru.com/': # This page should open in case of DPI, it's not blocked.
-        {'status': 200, 'lookfor': 'PoniBooru', 'ip': '104.28.10.65', 'ipv6': '2400:cb00:2048:1::681c:a41'},
+    'http://www.kaspersky.ru/':
+        {'status': 200, 'lookfor': 'GWP-17530', 'ip': '93.159.228.19', 'follow_redirects': False},
 
-    'http://pbooru.com/index.php?page=post&s=view&id=303026': # And this should not.
-        {'status': 200, 'lookfor': 'PoniBooru', 'ip': '104.28.10.65', 'ipv6': '2400:cb00:2048:1::681c:a41'},
+    'http://www.drweb.ru/':
+        {'status': 301, 'lookfor': 'drwse=', 'ip': '178.248.232.183', 'follow_redirects': False},
 
-    'http://furry.booru.org/':
-        {'status': 200, 'lookfor': 'FurryBooru', 'ip': '5.178.68.73', 'ipv6': '2a00:1ca8:ae::10'},
+    'http://vk.com/':
+        {'status': 302, 'lookfor': 'remixlang=', 'ip': '95.213.11.180', 'follow_redirects': False},
 
-    'http://furry.booru.org/index.php?page=post&s=view&id=111173':
-        {'status': 200, 'lookfor': 'FurryBooru', 'ip': '5.178.68.73', 'ipv6': '2a00:1ca8:ae::10'},
+    'http://auth.vk.com/':
+        {'status': 301, 'lookfor': 'Location: https://vk.com', 'ip': '87.240.165.82', 'follow_redirects': False},
 
-    'http://rutracker.org/forum/index.php':
-        {'status': 200, 'lookfor': 'groupcp.php"', 'ip': '195.82.146.214', 'ipv6': '2a02:4680:22::214'},
+    'http://ok.ru/':
+        {'status': 302, 'lookfor': 'Apache-Coyote', 'ip': '217.20.155.58', 'follow_redirects': False},
 
-    'http://a.putinhuylo.com/':
-        {'status': 200, 'lookfor': 'Antizapret', 'ip': '195.123.209.38', 'subdomain': True,
-         'is_blacklisted': False},
+    'http://mail.ru/':
+        {'status': 302, 'lookfor': 'mrcu=', 'ip': '94.100.180.199', 'ipv6': '2a00:1148:db00:0:b0b0::1',
+         'follow_redirects': False},
+
+    'http://ya.ru/':
+        {'status': 302, 'lookfor': 'yandexuid=', 'ip': '87.250.250.242', 'ipv6': '2a02:6b8::2:242',
+         'follow_redirects': False},
+
+    'http://yandex.ru/':
+        {'status': 302, 'lookfor': 'yandexuid=', 'ip': '77.88.55.88', 'ipv6': '2a02:6b8:a::a',
+         'follow_redirects': False},
+
+    'http://yandex.ua/':
+        {'status': 302, 'lookfor': 'yandexuid=', 'ip': '77.88.55.77', 'ipv6': '2a02:6b8:a::a',
+         'follow_redirects': False},
+
+    'http://family.yandex.ru/':
+        {'status': 302, 'lookfor': 'yandexuid=', 'ip': '93.158.134.3', 'ipv6': '2a02:6b8::3',
+         'follow_redirects': False},
+
+    'http://auto.ru/':
+        {'status': 301, 'lookfor': 'X-Autoru-LB', 'ip': '213.180.204.188', 'follow_redirects': False},
 }
 
-https_list = {'https://rutracker.org/forum/index.php', 'https://lolibooru.moe/',
-              'https://e621.net/', 'https://www.dailymotion.com/'}
+https_list = {'https://ok.ru/',
+              'https://yandex.ru/', 'https://pass.yandex.ua/', 'https://family.yandex.ru/',
+#              'https://vk.com/',
+              'https://auto.ru/',
+              'https://noransom.kaspersky.ru/',
+              'https://www.drweb.ru',
+              }
 
 dpi_list =   {
     # These tests are currently performed only using IPv4. IPv6 field is not used.
 
-    'rutracker.org':
-    {'host': 'rutracker.org', 'urn': '/forum/index.php',
-        'lookfor': 'groupcp.php"', 'ip': '195.82.146.214', 'ipv6': '2a02:4680:22::214'},
-    'pbooru.com':
-    {'host': 'pbooru.com', 'urn': '/index.php?page=post&s=view&id=303026',
-        'lookfor': 'Related Posts', 'ip': '104.28.10.65', 'ipv6': '2400:cb00:2048:1::681c:a41'},
+    'www.kaspersky.ru':
+    {'host': 'www.kaspersky.ru', 'urn': '/',
+        'lookfor': 'GWP-17530', 'ip': '93.159.228.19'},
 }
 
 proxy_addr = 'proxy.antizapret.prostovpn.org:3128'
