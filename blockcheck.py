@@ -597,7 +597,7 @@ def test_dns(dnstype=DNS_IPV4):
         return 5
 
     if resolved_default_dns == resolved_google_dns:
-        if not resolved_fake_dns:
+        if not resolved_fake_dns and len(resolved_default_dns) == len(dns_records):
             print("[✓] DNS-записи не подменяются")
             print("[✓] DNS не перенаправляется")
             return 0
