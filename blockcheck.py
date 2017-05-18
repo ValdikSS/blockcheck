@@ -273,7 +273,18 @@ def _get_a_records(sitelist, querytype='A', dnsserver=None, googleapi=False):
 def _decode_bytes(input_bytes):
     return input_bytes.decode(errors='replace')
 
-def _get_url(url, proxy=None, ip=None):
+def _get_url(url, proxy=None, ip=None, headers=False, follow_redirects=True):
+    class NoRedirectHandler(urllib.request.HTTPRedirectHandler):
+        def http_error_302(self, req, fp, code, msg, headers):
+            infourl = urllib.response.addinfourl(fp, headers, req.get_full_url())
+            infourl.status = code
+            infourl.code = code
+            return infourl
+        http_error_300 = http_error_302
+        http_error_301 = http_error_302
+        http_error_303 = http_error_302
+        http_error_307 = http_error_302
+
     parsed_url = list(urllib.parse.urlsplit(url))
     host = parsed_url[1]
 
@@ -310,7 +321,11 @@ def _get_url(url, proxy=None, ip=None):
     # We performed hostname matching manually before
     context.check_hostname = False
     https_handler = urllib.request.HTTPSHandler(context=context)
-    opener = urllib.request.build_opener(https_handler)
+    if not follow_redirects:
+        # HACK: this works only for HTTP and conflicts with https_handler
+        opener = urllib.request.build_opener(NoRedirectHandler, https_handler)
+    else:
+        opener = urllib.request.build_opener(https_handler)
 
     if ip:
         parsed_url[1] = '[' + str(ip) + ']' if ':' in str(ip) else str(ip)
@@ -328,6 +343,9 @@ def _get_url(url, proxy=None, ip=None):
     try:
         opened = opener.open(req, timeout=15)
         output = opened.read()
+        output = _decode_bytes(output)
+        if (headers):
+            output = str(opened.headers) + output
         opened.close()
     except (ssl.CertificateError, ssl.SSLError) as e:
         print_debug("_get_url: late ssl.CertificateError", repr(e))
@@ -343,7 +361,7 @@ def _get_url(url, proxy=None, ip=None):
     except Exception as e:
         print("[☠] Неизвестная ошибка:", repr(e))
         return (0, '')
-    return (opened.status, _decode_bytes(output))
+    return (opened.status, output)
 
 def _cut_str(string, begin, end):
     cut_begin = string.find(begin)
@@ -630,10 +648,14 @@ def test_http_access(by_ip=False):
                 sites[site]['ipv6'] = '[' + newipv6[0] + ']'
 
         if ipv6_available:
-            result = _get_url(site, ip=sites[site].get('ip'))
-            result_v6 = _get_url(site, ip=sites[site].get('ipv6'))
+            result = _get_url(site, ip=sites[site].get('ip'), headers=True,
+                              follow_redirects=sites[site].get('follow_redirects', True))
+            result_v6 = _get_url(site, ip=sites[site].get('ipv6'), headers=True,
+                                 follow_redirects=sites[site].get('follow_redirects', True))
         else:
-            result = _get_url(site, ip=sites[site].get('ip') if by_ip else None)
+            result = _get_url(site, ip=sites[site].get('ip') if by_ip else None,
+                              headers=True,
+                              follow_redirects=sites[site].get('follow_redirects', True))
 
         result_ok = (result[0] == sites[site]['status'] and result[1].find(sites[site]['lookfor']) != -1)
         if ipv6_available and sites[site].get('ipv6'):
@@ -731,10 +753,10 @@ def test_https_cert():
         newip = _get_a_record_over_google_api(domain)
         if newip:
             newip = newip[0]
-            result = _get_url(site, ip=newip)
+            result = _get_url(site, ip=newip, follow_redirects=False)
         else:
             print_debug("Can't resolve IP for", site)
-            result = _get_url(site)
+            result = _get_url(site, follow_redirects=False)
         if result[0] == -1:
             print("[☠] Сертификат подменяется")
             siteresults.append(False)
