@@ -405,7 +405,7 @@ def _dpi_build_tests(host, urn, ip, lookfor):
                 'lookfor': lookfor, 'ip': ip,
                 'fragment_size': 0, 'fragment_count': 0},
             'перенос строки перед GET':
-                {'data': "\nGET {} HTTP/1.0\r\n".format(urn) + \
+                {'data': "\r\nGET {} HTTP/1.0\r\n".format(urn) + \
                         "Host: {}\r\nConnection: close\r\n\r\n".format(host),
                 'lookfor': lookfor, 'ip': ip,
                 'fragment_size': 0, 'fragment_count': 0},
@@ -424,9 +424,14 @@ def _dpi_build_tests(host, urn, ip, lookfor):
                         "Host: {}.\r\nConnection: close\r\n\r\n".format(host),
                 'lookfor': lookfor, 'ip': ip,
                 'fragment_size': 0, 'fragment_count': 0},
-            'заголовок host вместо Host':
+            'заголовок hoSt вместо Host':
                 {'data': "GET {} HTTP/1.0\r\n".format(urn) + \
-                        "host: {}\r\nConnection: close\r\n\r\n".format(host),
+                        "hoSt: {}\r\nConnection: close\r\n\r\n".format(host),
+                'lookfor': lookfor, 'ip': ip,
+                'fragment_size': 0, 'fragment_count': 0},
+            'отсутствие пробела между двоеточием и значением заголовка Host':
+                {'data': "GET {} HTTP/1.0\r\n".format(urn) + \
+                        "Host:{}\r\nConnection: close\r\n\r\n".format(host),
                 'lookfor': lookfor, 'ip': ip,
                 'fragment_size': 0, 'fragment_count': 0},
             'перенос строки в заголовках в UNIX-стиле':
@@ -439,6 +444,11 @@ def _dpi_build_tests(host, urn, ip, lookfor):
                         "Connection: close\r\nHost: {}\r\n\r\n".format(host),
                 'lookfor': lookfor, 'ip': ip,
                 'fragment_size': 0, 'fragment_count': 0},
+            'фрагментирование заголовка, hoSt и отсутствие пробела одновременно':
+                {'data': "GET {} HTTP/1.0\r\n".format(urn) + \
+                        "hoSt:{}\r\nConnection: close\r\n\r\n".format(host),
+                'lookfor': lookfor, 'ip': ip,
+                'fragment_size': 2, 'fragment_count': 6},
         }
     return dpi_built_list
 
