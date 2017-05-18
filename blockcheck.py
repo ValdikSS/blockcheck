@@ -1045,7 +1045,7 @@ def main():
     if not disable_report:
         try:
             report_request = urllib.request.urlopen(
-                'http://blockcheck.antizapret.prostovpn.org/postdata.php',
+                'http://blockcheck.antizapret.prostovpn.org/postdata-ua.php',
                 data=urllib.parse.urlencode({
                     "text": printed_text,
                     "text_debug": printed_text_with_debug if really_bad_fuckup else '',
