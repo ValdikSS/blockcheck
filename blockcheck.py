@@ -623,7 +623,7 @@ def test_http_access(by_ip=False):
     sites = http_list
     proxy = proxy_addr
 
-    print("[O] Тестируем HTTP")
+    print("[O] Тестируем HTTP" + (' (по настоящим IP-адресам сайтов)' if by_ip else ''))
 
     successes_v4 = 0
     successes_v6 = 0
@@ -787,7 +787,7 @@ def test_https_cert():
         return 3
 
 def test_dpi():
-    print("[O] Тестируем обход DPI")
+    print("[O] Тестируем обход DPI" + (' (только IPv4)' if ipv6_available else ''))
 
     dpiresults = []
     for dpisite in dpi_list:
