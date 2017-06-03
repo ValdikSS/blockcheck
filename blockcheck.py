@@ -292,6 +292,7 @@ def _get_url(url, proxy=None, ip=None, headers=False, follow_redirects=True):
         # Manually check certificate as we may need to connect by IP later
         # and handling certificate check in urllib is painful and invasive
         context_hostname_check = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
+        context_hostname_check.verify_mode = ssl.CERT_REQUIRED
         conn = context_hostname_check.wrap_socket(socket.socket(socket.AF_INET6 if \
             (':' in ip if ip else False) else socket.AF_INET),
             server_hostname=host)
@@ -318,8 +319,11 @@ def _get_url(url, proxy=None, ip=None, headers=False, follow_redirects=True):
 
     # SSL Context for urllib
     context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
-    # We performed hostname matching manually before
+    # Disable SSL certificate check as we validated it earlier
+    # This is required to bypass SNI woes when we connect by IP
     context.check_hostname = False
+    context.verify_mode = ssl.CERT_NONE
+
     https_handler = urllib.request.HTTPSHandler(context=context)
     if not follow_redirects:
         # HACK: this works only for HTTP and conflicts with https_handler
