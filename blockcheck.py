@@ -39,7 +39,7 @@ Thank you.
 '''
 
 # Configuration
-VERSION="0.0.9.4"
+VERSION="0.0.9.5"
 
 dns_records_list = (
     # First server in this list should have both A and AAAA records
