@@ -499,8 +499,8 @@ def check_isup(page_url):
     if disable_isup:
         return True
     elif page_url.startswith("https://"):
-        print("[☠] {} не поддерживает HTTPS, считаем, что сайт работает, "
-              "а проблемы только у нас".format(isup_server))
+        #print("[☠] {} не поддерживает HTTPS, считаем, что сайт работает, "
+        #      "а проблемы только у нас".format(isup_server))
         return True
 
     print("\tПроверяем доступность через {}".format(isup_server))
