@@ -301,11 +301,13 @@ def _get_url(url, proxy=None, ip=None, headers=False, follow_redirects=True):
             (':' in ip if ip else False) else 'IPv4'))
         try:
             conn.connect((ip if ip else host, 443))
-        except (ssl.CertificateError, ssl.SSLError) as e:
+        except (ssl.CertificateError) as e:
             print_debug("_get_url: ssl.CertificateError", repr(e))
             return (-1, '')
-        except (socket.timeout, socket.error) as e:
+        except (ssl.SSLError, socket.timeout, socket.error) as e:
             print_debug("_get_url: socket exception", repr(e))
+            if 'CERTIFICATE_VERIFY_FAILED' in str(e):
+                return (-1, '')
             return (0, '')
         finally:
             try:
@@ -351,10 +353,10 @@ def _get_url(url, proxy=None, ip=None, headers=False, follow_redirects=True):
         if (headers):
             output = str(opened.headers) + output
         opened.close()
-    except (ssl.CertificateError, ssl.SSLError) as e:
+    except (ssl.CertificateError) as e:
         print_debug("_get_url: late ssl.CertificateError", repr(e))
         return (-1, '')
-    except (urllib.error.URLError, socket.error, socket.timeout) as e:
+    except (urllib.error.URLError, ssl.SSLError, socket.error, socket.timeout) as e:
         print_debug("_get_url: late socket exception", repr(e))
         if 'CERTIFICATE_VERIFY_FAILED' in str(e):
             return (-1, '')
