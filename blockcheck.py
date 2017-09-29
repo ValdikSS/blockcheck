@@ -454,6 +454,16 @@ def _dpi_build_tests(host, urn, ip, lookfor):
                         "hoSt: {}\r\nConnection: close\r\n\r\n".format(host),
                 'lookfor': lookfor, 'ip': ip,
                 'fragment_size': 0, 'fragment_count': 0},
+            'заголовок hOSt вместо Host':
+                {'data': "GET {} HTTP/1.0\r\n".format(urn) + \
+                        "hOSt: {}\r\nConnection: close\r\n\r\n".format(host),
+                'lookfor': lookfor, 'ip': ip,
+                'fragment_size': 0, 'fragment_count': 0},
+            'значение Host БОЛЬШИМИ БУКВАМИ':
+                {'data': "GET {} HTTP/1.0\r\n".format(urn) + \
+                        "Host: {}\r\nConnection: close\r\n\r\n".format(host.upper()),
+                'lookfor': lookfor, 'ip': ip,
+                'fragment_size': 0, 'fragment_count': 0},
             'отсутствие пробела между двоеточием и значением заголовка Host':
                 {'data': "GET {} HTTP/1.0\r\n".format(urn) + \
                         "Host:{}\r\nConnection: close\r\n\r\n".format(host),
