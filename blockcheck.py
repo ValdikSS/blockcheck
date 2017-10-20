@@ -250,7 +250,7 @@ def _get_a_record_over_google_api(site, querytype='A'):
 
 def _get_a_records(sitelist, querytype='A', dnsserver=None, googleapi=False):
     result = []
-    for site in sitelist:
+    for site in sorted(sitelist):
         try:
             if googleapi:
                 responses = _get_a_record_over_google_api(site, querytype)
@@ -648,7 +648,7 @@ def test_http_access(by_ip=False):
     result_v4 = -1
     result_v6 = -1
 
-    for site in sites:
+    for site in sorted(sites):
         print("\tОткрываем ", site)
         # First try to resolve IP address using Google API.
         # Use a static one if this did not work.
@@ -763,7 +763,7 @@ def test_https_cert():
     print("[O] Тестируем HTTPS")
 
     siteresults = []
-    for site in sites:
+    for site in sorted(sites):
         print("\tОткрываем ", site)
         domain = list(urllib.parse.urlsplit(site))[1]
         newip = _get_a_record_over_google_api(domain)
@@ -802,7 +802,7 @@ def test_dpi():
     print("[O] Тестируем обход DPI" + (' (только IPv4)' if ipv6_available else ''))
 
     dpiresults = []
-    for dpisite in dpi_list:
+    for dpisite in sorted(dpi_list):
         site = dpi_list[dpisite]
         # First try to resolve IP address using Google API.
         # Use a static one if this did not work.
@@ -815,7 +815,7 @@ def test_dpi():
                 site['ipv6'] = newip[0]
 
         dpi_built_tests = _dpi_build_tests(site['host'], site['urn'], site['ip'], site['lookfor'])
-        for testname in dpi_built_tests:
+        for testname in sorted(dpi_built_tests):
             test = dpi_built_tests[testname]
             print("\tПробуем способ «{}» на {}".format(testname, dpisite))
             try:
