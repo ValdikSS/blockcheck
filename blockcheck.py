@@ -40,6 +40,7 @@ Thank you.
 
 # Configuration
 VERSION="0.0.9.6"
+SWHOMEPAGE="https://github.com/ValdikSS/blockcheck"
 
 dns_records_list = (
     # First server in this list should have both A and AAAA records
@@ -381,7 +382,10 @@ def _cut_str(string, begin, end):
 def _get_ip_and_isp():
     # Dirty and cheap
     try:
-        data = _decode_bytes(urllib.request.urlopen("http://2ip.ru/", timeout=10).read())
+        request = urllib.request.Request("https://2ip.ru/",
+                     headers={"User-Agent": "Blockcheck/" + VERSION + " " + SWHOMEPAGE}
+                     )
+        data = _decode_bytes(urllib.request.urlopen(request, timeout=10).read())
         ip = _cut_str(data, '<big id="d_clip_button">', '</big>')
         isp = ' '.join(_cut_str(data, '"/isp/', '</a>').replace('">', '').split())
         if ip and isp:
