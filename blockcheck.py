@@ -41,6 +41,7 @@ Thank you.
 # Configuration
 VERSION="0.0.9.6"
 SWHOMEPAGE="https://github.com/ValdikSS/blockcheck"
+SWUSERAGENT="Blockcheck/" + VERSION + " " + SWHOMEPAGE
 
 dns_records_list = (
     # First server in this list should have both A and AAAA records
@@ -345,7 +346,7 @@ def _get_url(url, proxy=None, ip=None, headers=False, follow_redirects=True):
     if proxy:
         req.set_proxy(proxy, 'http')
     
-    req.add_header('User-Agent', 'Mozilla/5.0 (X11; Linux x86_64; rv:30.0) Gecko/20100101 Firefox/30.0')
+    req.add_header('User-Agent', SWUSERAGENT)
 
     try:
         opened = opener.open(req, timeout=15)
@@ -383,7 +384,7 @@ def _get_ip_and_isp():
     # Dirty and cheap
     try:
         request = urllib.request.Request("https://2ip.ru/",
-                     headers={"User-Agent": "Blockcheck/" + VERSION + " " + SWHOMEPAGE}
+                     headers={"User-Agent": SWUSERAGENT}
                      )
         data = _decode_bytes(urllib.request.urlopen(request, timeout=10).read())
         ip = _cut_str(data, '<big id="d_clip_button">', '</big>')
