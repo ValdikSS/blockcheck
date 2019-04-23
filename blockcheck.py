@@ -103,7 +103,7 @@ fake_dns = '3.3.3.3' #Fake server which should never reply
 fake_dns_v6 = '2600::10:20'
 google_dns_api = 'https://dns.google.com/resolve'
 isup_server = 'isup.me'
-isup_fmt = 'http://isup.me/{}'
+isup_fmt = 'https://api.downfor.cloud/httpcheck/{}'
 disable_isup = False #If true, presume that all sites are available
 disable_report = False
 disable_ipv6 = False
@@ -523,16 +523,19 @@ def check_isup(page_url):
 
     url = isup_fmt.format(page_url)
     status, output = _get_url(url)
+    if output:
+        output = json.loads(output)
+
     if status in (0, -1):
         print("[⁇] Ошибка при соединении с {}".format(isup_server))
         return None
     elif status != 200:
         print("[⁇] Неожиданный ответ от {}, код {}".format(isup_server, status))
         return None
-    elif output.find("It's just you") >= 0:
+    elif output.get('isDown') == False:
         print("[☠] Сайт доступен, проблемы только у нас")
         return True
-    elif output.find("looks down from here") >= 0:
+    elif output.get('isDown'):
         print("[✗] Сайт недоступен, видимо, он не работает")
         return False
     else:
