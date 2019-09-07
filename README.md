@@ -47,3 +47,11 @@ BlockCheck
 `--disable-ipv6` отключает все проверки, связанные с IPv6.
 
 Это не все доступные опции. Запустите программу с парамером `--help` для получения подробной информации.
+
+### Сборка исполняемого файла
+Для сборки исполняемого файла для Windows, Linux и macOS:
+
+1. Установите Python 3, с официального сайта или из репозиториев вашего дистрибутива
+2. python -m pip install -r requirements.txt
+3. python -m pip install pyinstaller
+4. pyinstaller blockcheck.spec
