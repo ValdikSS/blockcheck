@@ -55,3 +55,5 @@ BlockCheck
 2. python -m pip install -r requirements.txt
 3. python -m pip install pyinstaller
 4. pyinstaller blockcheck.spec
+
+Исполняемый файл будет в директории dist.
