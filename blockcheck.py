@@ -39,7 +39,7 @@ Thank you.
 '''
 
 # Configuration
-VERSION="0.0.9.7"
+VERSION="0.0.9.8"
 SWHOMEPAGE="https://github.com/ValdikSS/blockcheck"
 SWUSERAGENT="Blockcheck/" + VERSION + " " + SWHOMEPAGE
 
