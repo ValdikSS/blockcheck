@@ -362,6 +362,8 @@ def _get_url(url, proxy=None, ip=None, headers=False, follow_redirects=True):
         print_debug("_get_url: late socket exception", repr(e))
         if 'CERTIFICATE_VERIFY_FAILED' in str(e):
             return (-1, '')
+        if type(e) is urllib.error.HTTPError:
+            return(e.code, '')
         return (0, '')
     except (KeyboardInterrupt, SystemExit) as e:
         # re-raise exception to send it to caller function
@@ -784,7 +786,7 @@ def test_https_cert():
         if result[0] == -1:
             print("[☠] Сертификат подменяется")
             siteresults.append(False)
-        elif result[0] < 200:
+        elif result[0] == 0:
             print("[☠] Сайт не открывается")
             if check_isup(site):
                 siteresults.append('no')
