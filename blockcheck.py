@@ -911,7 +911,7 @@ def test_dpi_https():
                     siteresults.append(True)
                     print("[✓] Сайт открывается")
                 except (ssl.SSLError, socket.error) as e:
-                    if socket_ok:
+                    if not socket_ok:
                         print("[☠] Ошибка (сокет):", repr(e))
                     else:
                         print("[☠] Ошибка (TLS):", repr(e))
