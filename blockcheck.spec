@@ -13,7 +13,6 @@ hooks_r = []
 if sys_os == 'linux':
     ca_bundle = [('./ca-certificates.crt', 'lib')]
     add_datas = ca_bundle
-    add_binaries = [('./libssl.so.1.1', '.'), ('./libcrypto.so.1.1', '.')]
 
 if sys_os == 'darwin':
     add_datas = [('/System/Library/Frameworks/Tk.framework/Tk', '.'),
@@ -21,6 +20,9 @@ if sys_os == 'darwin':
                 ]
     hooks_p = ['osx_hooks']
     hooks_r = ['osx_hooks/loader/pyi_rth__tkinter.py']
+
+if sys_os == 'win32':
+    add_binaries = [('./libssl-1_1.dll', '.'), ('./libcrypto-1_1.dll', '.')]
 
 block_cipher = None
 
@@ -55,7 +57,10 @@ a.binaries -= [
                    ('libXss.so.1', None, None),
                    ('libz.so.1', None, None),
                    ('libreadline.so.6', None, None),
+				   ('libssl-1_1.dll', None, None),
+				   ('libcrypto-1_1.dll', None, None),
                    ]
+a.binaries += [('libcrypto-1_1.dll', 'libcrypto-1_1.dll', 'BINARY'), ('libssl-1_1.dll', 'libssl-1_1.dll', 'BINARY')]
 
 exe = EXE(pyz,
           a.scripts,
