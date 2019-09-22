@@ -6,12 +6,14 @@ sys_os = exec_statement("""
     print(sys.platform)""").strip()
 
 add_datas = []
+add_binaries = []
 hooks_p = []
 hooks_r = []
 
 if sys_os == 'linux':
-    ca_bundle = [('/etc/ssl/certs/ca-certificates.crt', 'lib')]
+    ca_bundle = [('./ca-certificates.crt', 'lib')]
     add_datas = ca_bundle
+    add_binaries = [('./libssl.so.1.1', '.'), ('./libcrypto.so.1.1', '.')]
 
 if sys_os == 'darwin':
     add_datas = [('/System/Library/Frameworks/Tk.framework/Tk', '.'),
@@ -25,7 +27,7 @@ block_cipher = None
 
 a = Analysis(['blockcheck.py'],
              pathex=[],
-             binaries=[],
+             binaries=add_binaries,
              datas=add_datas,
              hiddenimports=[],
              hookspath=hooks_p,
@@ -66,7 +68,8 @@ exe = EXE(pyz,
           upx=True,
           console=False )
 
-exe_folder = EXE(pyz,
+if sys_os == 'win32':
+    exe_folder = EXE(pyz,
           a.scripts,
           [],
           name='blockcheck_folder',
@@ -76,7 +79,7 @@ exe_folder = EXE(pyz,
           upx=True,
           console=False )
 
-coll = COLLECT(exe_folder,
+    coll = COLLECT(exe_folder,
                a.binaries,
                a.zipfiles,
                a.datas,

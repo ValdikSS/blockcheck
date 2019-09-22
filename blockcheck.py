@@ -39,7 +39,7 @@ Thank you.
 '''
 
 # Configuration
-VERSION="0.0.9.8"
+VERSION="0.0.9.8-tls_experiment_v1"
 SWHOMEPAGE="https://github.com/ValdikSS/blockcheck"
 SWUSERAGENT="Blockcheck/" + VERSION + " " + SWHOMEPAGE
 
@@ -846,6 +846,78 @@ def test_dpi():
                     print("[☠] Сайт не открывается")
     return list(set(dpiresults))
 
+def test_dpi_https():
+    sites = dns_records_list
+
+    SSL_OP_TLSEXT_PADDING = 0x00000010
+    SSL_OP_TLSEXT_NOSNI_FIRST = 0x00000020
+    SSL_OP_TLSEXT_FAKESNI_FIRST = 0x00000080
+    SSL_OP_TLSEXT_SNI_BEFORE_PADDING = 0x00000100
+    SSL_OP_TLSEXT_SNI_AFTER_PADDING = 0x00000200
+
+    def create_dpissl_context(padding=False, nosni_first=False, fakesni_first=False,
+                            add_sni_before_padding=False, add_sni_after_padding=False):
+        context = ssl.create_default_context()
+        if padding:
+            context.options |= SSL_OP_TLSEXT_PADDING
+        else:
+            context.options &= ~SSL_OP_TLSEXT_PADDING
+
+        options = (
+            (SSL_OP_TLSEXT_NOSNI_FIRST if nosni_first else 0) |
+            (SSL_OP_TLSEXT_FAKESNI_FIRST if fakesni_first else 0) |
+            (SSL_OP_TLSEXT_SNI_BEFORE_PADDING if add_sni_before_padding else 0) |
+            (SSL_OP_TLSEXT_SNI_AFTER_PADDING if add_sni_after_padding else 0)
+        )
+        context.options |= options
+        return context
+
+    print("[O] Тестируем обход DPI (HTTPS)")
+
+    siteresults = []
+    experiments = {
+        'Обычный запрос':
+            {'context' : create_dpissl_context()},
+        'ClientHello без SNI':
+            {'context' : create_dpissl_context(nosni_first=True)},
+        'ClientHello с большим padding':
+            {'context' : create_dpissl_context(padding=True)},
+        'ClientHello с большим padding и SNI только в конце padding':
+            {'context' : create_dpissl_context(padding=True, nosni_first=True, add_sni_after_padding=True)},
+        'ClientHello с большим padding, поддельным SNI в начале и правильным до padding':
+            {'context' : create_dpissl_context(padding=True, fakesni_first=True, add_sni_before_padding=True)},
+        'ClientHello с большим padding, поддельным SNI в начале и правильным после padding':
+            {'context' : create_dpissl_context(padding=True, fakesni_first=True, add_sni_after_padding=True)}
+    }
+
+    for site in sorted(sites):
+        domain = site
+        newip = _get_a_record_over_google_api(domain)
+        if newip:
+            newip = newip[0]
+            for experiment_name in experiments:
+                ssl_context = experiments[experiment_name].get('context')
+                socket_ok = False
+                try:
+                    print("\t Пробуем {} на {}".format(experiment_name, domain))
+                    sock = socket.create_connection((newip, 443), timeout=10)
+                    socket_ok = True
+                    ssock = ssl_context.wrap_socket(sock, server_hostname=domain,
+                                                    do_handshake_on_connect=False)
+                    ssock.do_handshake()
+                    ssock.send("GET / HTTP/1.0\r\nHost: {}\r\n\r\n".format(domain).encode('utf-8'))
+                    ssock.recv()
+                    #print(ssock.recv().decode('utf-8'))
+                    siteresults.append(True)
+                    print("[✓] Сайт открывается")
+                except (ssl.SSLError, socket.error) as e:
+                    if socket_ok:
+                        print("[☠] Ошибка (сокет):", repr(e))
+                    else:
+                        print("[☠] Ошибка (TLS):", repr(e))
+                    siteresults.append(False)
+    return siteresults
+
 def check_ipv6_availability():
     print("Проверка работоспособности IPv6", end='')
     v6addr = _get_a_record("ipv6.icanhazip.com", "AAAA")
@@ -883,10 +955,12 @@ def main():
     print("Для получения корректных результатов используйте DNS-сервер",
         "провайдера и отключите средства обхода блокировок.")
     print()
+    '''
     latest_version = _get_url("https://raw.githubusercontent.com/ValdikSS/blockcheck/master/latest_version.txt")
     if latest_version[0] == 200 and latest_version[1].strip() != VERSION:
         print("Доступная новая версия программы: {}. Обновитесь, пожалуйста.".format(latest_version[1].strip()))
         print()
+    '''
     if not disable_ipv6:
         ipv6_available = check_ipv6_availability()
         if (ipv6_available):
@@ -918,6 +992,8 @@ def main():
     if http_v4 > 0 or http_v6 > 0 or force_dpi_check:
         dpi = test_dpi()
         print()
+    test_dpi_https()
+    print()
     print("[!] Результат:")
     if dnsv4 == 5:
         print("[⚠] Не удалось определить способ блокировки IPv4 DNS.\n",
