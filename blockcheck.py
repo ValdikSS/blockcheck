@@ -491,6 +491,53 @@ def _dpi_build_tests(host, urn, ip, lookfor):
                         "hoSt:{}\r\nConnection: close\r\n\r\n".format(host),
                 'lookfor': lookfor, 'ip': ip,
                 'fragment_size': 2, 'fragment_count': 6},
+            '7 КБ данных перед Host':
+                {'data': "GET {} HTTP/1.0\r\n".format(urn) + \
+                         "Connection: close\r\n" + \
+                         "X-Padding1: {}\r\n".format('1'*1000) + \
+                         "X-Padding2: {}\r\n".format('2'*1000) + \
+                         "X-Padding3: {}\r\n".format('3'*1000) + \
+                         "X-Padding4: {}\r\n".format('4'*1000) + \
+                         "X-Padding5: {}\r\n".format('5'*1000) + \
+                         "X-Padding6: {}\r\n".format('6'*1000) + \
+                         "X-Padding7: {}\r\n".format('7'*1000) + \
+                         "Host: {}\r\n\r\n".format(host),
+                 'lookfor': lookfor, 'ip': ip,
+                 'fragment_size': 0, 'fragment_count': 0},
+            '15 КБ данных перед Host':
+                {'data': "GET {} HTTP/1.0\r\n".format(urn) + \
+                         "Connection: close\r\n" + \
+                         "X-Padding1: {}\r\n".format('1'*1000) + \
+                         "X-Padding2: {}\r\n".format('2'*1000) + \
+                         "X-Padding3: {}\r\n".format('3'*1000) + \
+                         "X-Padding4: {}\r\n".format('4'*1000) + \
+                         "X-Padding5: {}\r\n".format('5'*1000) + \
+                         "X-Padding6: {}\r\n".format('6'*1000) + \
+                         "X-Padding7: {}\r\n".format('7'*1000) + \
+                         "X-Padding8: {}\r\n".format('8'*1000) + \
+                         "X-Padding9: {}\r\n".format('9'*1000) + \
+                         "X-Padding10: {}\r\n".format('0'*1000) + \
+                         "X-Padding11: {}\r\n".format('1'*1000) + \
+                         "X-Padding12: {}\r\n".format('2'*1000) + \
+                         "X-Padding13: {}\r\n".format('3'*1000) + \
+                         "X-Padding14: {}\r\n".format('4'*1000) + \
+                         "X-Padding15: {}\r\n".format('5'*1000) + \
+                         "Host: {}\r\n\r\n".format(host),
+                 'lookfor': lookfor, 'ip': ip,
+                 'fragment_size': 0, 'fragment_count': 0},
+            '21 КБ данных перед Host':
+                {'data': "GET {} HTTP/1.0\r\n".format(urn) + \
+                         "Connection: close\r\n" + \
+                         "X-Padding1: {}\r\n".format('1'*3000) + \
+                         "X-Padding2: {}\r\n".format('2'*3000) + \
+                         "X-Padding3: {}\r\n".format('3'*3000) + \
+                         "X-Padding4: {}\r\n".format('4'*3000) + \
+                         "X-Padding5: {}\r\n".format('5'*3000) + \
+                         "X-Padding6: {}\r\n".format('6'*3000) + \
+                         "X-Padding7: {}\r\n".format('7'*3000) + \
+                         "Host: {}\r\n\r\n".format(host),
+                 'lookfor': lookfor, 'ip': ip,
+                 'fragment_size': 0, 'fragment_count': 0},
         }
     return dpi_built_list
 
