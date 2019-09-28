@@ -317,11 +317,11 @@ def _get_url(url, proxy=None, ip=None, headers=False, follow_redirects=True):
         finally:
             try:
                 conn.shutdown(socket.SHUT_RDWR)
-            except:
+            except Exception:
                 pass
             try:
                 conn.close()
-            except:
+            except Exception:
                 pass
 
     # SSL Context for urllib
@@ -397,7 +397,7 @@ def _get_ip_and_isp():
         if ip and isp:
             isp = urllib.parse.unquote(isp).replace('+', ' ')
             return (ip, isp)
-    except:
+    except Exception:
         return
 
 def _mask_ip(ipaddr):
@@ -427,7 +427,7 @@ def _dpi_send(host, port, data, fragment_size=0, fragment_count=0):
     finally:
         try:
             sock.shutdown(socket.SHUT_RDWR)
-        except:
+        except Exception:
             pass
         sock.close()
     return _decode_bytes(recv)
