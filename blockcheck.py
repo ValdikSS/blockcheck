@@ -129,7 +129,10 @@ try:
     import tkinter.scrolledtext as tkst
     import threading
     import queue
+
     tkusable = True
+    if not (os.environ.get('DISPLAY') or os.environ.get('WAYLAND_DISPLAY')):
+        tkusable = False
 
     class ThreadSafeConsole(tkst.ScrolledText):
         def __init__(self, master, **options):
@@ -1159,7 +1162,7 @@ if __name__ == "__main__":
         threading.Thread(target=main).start()
         try:
             root.mainloop()
-        except SystemExit:
+        except (KeyboardInterrupt, SystemExit):
             os._exit(0)
     else:
         try:
