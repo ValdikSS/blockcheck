@@ -103,8 +103,8 @@ google_dns_v6 = '2001:4860:4860::8844'
 fake_dns = '3.3.3.3' #Fake server which should never reply
 fake_dns_v6 = '2600::10:20'
 google_dns_api = 'https://dns.google.com/resolve'
-isup_server = 'isup.me'
-isup_fmt = 'https://api.downfor.cloud/httpcheck/{}'
+isup_server = 'isitdownrightnow.com'
+isup_fmt = 'https://www.isitdownrightnow.com/check.php?domain={}'
 disable_isup = False #If true, presume that all sites are available
 disable_report = False
 disable_ipv6 = False
@@ -224,7 +224,7 @@ def _get_a_record(site, querytype='A', dnsserver=None):
     result = []
     while len(resolver.nameservers):
         try:
-            resolved = resolver.query(site, querytype)
+            resolved = resolver.resolve(site, querytype)
             print_debug(str(resolved.response))
             for item in resolved.rrset.items:
                 result.append(item.to_text())
@@ -574,21 +574,21 @@ def check_isup(page_url):
 
     print("\tПроверяем доступность через {}".format(isup_server))
 
-    url = isup_fmt.format(page_url)
+    url = isup_fmt.format(urllib.parse.urlparse(page_url).netloc)
     status, output = _get_url(url)
-    if output:
-        output = json.loads(output)
-
+    #if output:
+    #    output = json.loads(output)
+    
     if status in (0, -1):
         print("[⁇] Ошибка при соединении с {}".format(isup_server))
         return None
     elif status != 200:
         print("[⁇] Неожиданный ответ от {}, код {}".format(isup_server, status))
         return None
-    elif output.get('isDown') == False:
+    elif 'upicon' in output:
         print("[☠] Сайт доступен, проблемы только у нас")
         return True
-    elif output.get('isDown'):
+    elif 'downicon' in output:
         print("[✗] Сайт недоступен, видимо, он не работает")
         return False
     else:
