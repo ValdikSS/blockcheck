@@ -63,20 +63,11 @@ http_list = {
     #    subdomain:      This is non-blacklisted subdomain of a blacklisted domain.
     #    is_blacklisted: True if website is not blacklisted and should be treated so.
 
-    'http://pbooru.com/': # This page should open in case of DPI, it's not blocked.
-        {'status': 200, 'lookfor': 'PoniBooru', 'ip': '104.28.10.65', 'ipv6': '2400:cb00:2048:1::681c:a41'},
+    'http://novostey.com': # This page should open in case of DPI, it's not blocked.
+        {'status': 200, 'lookfor': 'novostey', 'ip': '172.64.80.1', 'ipv6': '2606:4700:130:436c:6f75:6466:6c61:7265'},
 
-    'http://pbooru.com/index.php?page=post&s=view&id=303026': # And this should not.
-        {'status': 200, 'lookfor': 'PoniBooru', 'ip': '104.28.10.65', 'ipv6': '2400:cb00:2048:1::681c:a41'},
-
-    'http://furry.booru.org/':
-        {'status': 200, 'lookfor': 'FurryBooru', 'ip': '104.31.10.182', 'ipv6': '2606:4700:31::681f:ab6'},
-
-    'http://furry.booru.org/index.php?page=post&s=view&id=111173':
-        {'status': 200, 'lookfor': 'FurryBooru', 'ip': '104.31.10.182', 'ipv6': '2606:4700:31::681f:ab6'},
-
-    'http://rutracker.org/forum/index.php':
-        {'status': 200, 'lookfor': 'groupcp.php"', 'ip': '195.82.146.214', 'ipv6': '2a02:4680:22::214'},
+    'https://xn----stbgdeb4aai6g.xn--p1ai/': # And this should not.
+        {'status': 200, 'lookfor': 'PoniBooru', 'ip': '37.1.203.158'},
 
     'http://a.putinhuylo.com/':
         {'status': 200, 'lookfor': 'Antizapret', 'ip': '195.123.209.38', 'subdomain': True,
@@ -97,7 +88,7 @@ dpi_list =   {
         'lookfor': 'Related Posts', 'ip': '104.28.10.65', 'ipv6': '2400:cb00:2048:1::681c:a41'},
 }
 
-proxy_addr = 'proxy.antizapret.prostovpn.org:3128'
+proxy_addr = '95.137.240.30:60030'
 google_dns = '8.8.4.4'
 google_dns_v6 = '2001:4860:4860::8844'
 fake_dns = '3.3.3.3' #Fake server which should never reply
